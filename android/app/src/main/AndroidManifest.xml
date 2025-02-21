@@ -10,15 +10,13 @@
         android:allowBackup="true"
         android:theme="@style/AppTheme"
         android:supportsRtl="true">
-
-        <!-- 카카오 SDK 설정 -->
+        
+        <!-- Google Maps API Key (필요한 경우) -->
         <meta-data
-            android:name="com.kakao.sdk.AppKey"
-            android:value="7798f0108bf85f0f9a3149d4bedae99c"/>
-        <meta-data
-            android:name="com.kakao.sdk.talk.enabled"
-            android:value="false" />
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDeVQ2wHr3QIavBa4RGYwZly8h0sNTfLmQ"/>
 
+        <!-- Main Activity -->
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -32,7 +30,7 @@
             </intent-filter>
         </activity>
 
-       
+        <!-- 카카오 SDK 설정 -->
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
             android:exported="true">
@@ -41,10 +39,10 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:host="oauth"
-                    android:scheme="kakao7798f0108bf85f0f9a3149d4bedae99c" />
+                      android:scheme="kakao7798f0108bf85f0f9a3149d4bedae99c" />
             </intent-filter>
         </activity>
-
+        
     </application>
 
 </manifest>
