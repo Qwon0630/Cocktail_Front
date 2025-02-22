@@ -1,23 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator, StackScreenProps } from "@react-navigation/stack";
+import { createStackNavigator } from "@react-navigation/stack";
 import SplashScreen from "react-native-splash-screen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { SafeAreaView, StatusBar, StyleSheet, View, ActivityIndicator, useColorScheme } from "react-native";
+import { View, ActivityIndicator, StyleSheet } from "react-native";
 import OnboardingScreen from "./screens/OnboardingScreen";
 import LoginScreen from "./screens/Login";
-import MapsScreen from"./screens/Maps";
+import MapsScreen from "./screens/Maps";
+import RecommendationIntroScreen from "./screens/RecommendationIntroScreen"; 
+import RecommendationFlowScreen from "./screens/RecommendationFlowScreen";
+import LoadingScreen from "./screens/LoadingScreen";
+import ResultScreen from "./screens/ResultScreen";
 
 type RootStackParamList = {
   Onboarding: undefined;
   Login: undefined;
-  Maps : undefined;
+  Maps: undefined;
+  RecommendationFlow: undefined;
+  RecommendationIntro: undefined;
+  LoadingScreen: undefined;
+  ResultScreen: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === "dark";
+const App: React.FC = () => {
   const [isFirstLaunch, setIsFirstLaunch] = useState<null | boolean>(null);
 
   useEffect(() => {
@@ -50,11 +57,15 @@ function App(): React.JSX.Element {
       <Stack.Navigator initialRouteName="Onboarding" screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Maps" component={MapsScreen}/>
+        <Stack.Screen name="Maps" component={MapsScreen} />
+        <Stack.Screen name="RecommendationIntro" component={RecommendationIntroScreen} />
+        <Stack.Screen name="RecommendationFlow" component={RecommendationFlowScreen} />
+        <Stack.Screen name="LoadingScreen" component={LoadingScreen} />
+        <Stack.Screen name="ResultScreen" component={ResultScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
-}
+};
 
 const styles = StyleSheet.create({
   loadingContainer: {
