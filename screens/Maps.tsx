@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, StyleSheet, Alert, Platform, PermissionsAndroid } from "react-native";
+import { Linking, View, StyleSheet, Alert, Platform, PermissionsAndroid } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE, Region } from "react-native-maps";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
@@ -24,14 +24,35 @@ const MapScreen = () => {
   const requestLocationPermission = async () => {
     if (Platform.OS === "ios") {
       const result = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
-      return result === RESULTS.GRANTED;
+      console.log("iOS 위치 권한 상태:", result);
+      if(result !== RESULTS.GRANTED){
+        showLocationPermissionAlert();
+        return false;
+      }
+      return true;
     } else {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
       );
-      return granted === PermissionsAndroid.RESULTS.GRANTED;
+      if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+        showLocationPermissionAlert();
+        return false;
+      }
+      return true;
     }
   };
+
+  // 위치 권한 요청 실패 시 설정 화면으로 이동하는 경고창
+const showLocationPermissionAlert = () => {
+  Alert.alert(
+    "위치 권한 필요",
+    "현재 위치를 가져오려면 위치 권한을 활성화해야 합니다.\n설정에서 권한을 허용해주세요.",
+    [
+      { text: "취소", style: "cancel" },
+      { text: "설정으로 이동", onPress: () => Linking.openSettings() },
+    ]
+  );
+};
 
   // 현재 위치 가져오기
   const getCurrentLocation = async () => {

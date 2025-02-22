@@ -35,6 +35,7 @@ const RecommendationFlowScreen: React.FC<Props> = ({ navigation }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: string }>({});
   const [allAnswered, setAllAnswered] = useState(false);
+  const [showOptions, setShowOptions] = useState(false);
 
   const questionOpacity = useRef(new Animated.Value(1)).current;
   const optionsOpacity = useRef(new Animated.Value(1)).current;
@@ -44,6 +45,7 @@ const RecommendationFlowScreen: React.FC<Props> = ({ navigation }) => {
   }, [selectedAnswers]);
 
   useEffect(() => {
+    setShowOptions(false);
     questionOpacity.setValue(0);
     optionsOpacity.setValue(0);
 
@@ -53,6 +55,7 @@ const RecommendationFlowScreen: React.FC<Props> = ({ navigation }) => {
       useNativeDriver: true,
     }).start(() => {
       setTimeout(() => {
+        setShowOptions(true);
         Animated.timing(optionsOpacity, {
           toValue: 1,
           duration: 500,
@@ -60,7 +63,7 @@ const RecommendationFlowScreen: React.FC<Props> = ({ navigation }) => {
         }).start();
       }, 500);
     });
-  }, [currentStep]);
+  }, [currentStep, questionOpacity, optionsOpacity]);
 
   const handleOptionSelect = (answer: string) => {
     setSelectedAnswers((prev) => ({
