@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleTypeRole</key>
+	<string>Editor</string>
+	<key>CFBundleURLSchemes</key>
+	<array>
+	<string>kakao7798f0108bf85f0f9a3149d4bedae99c</string>
+	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -48,5 +54,17 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>KAKAO_APP_KEY</key>
+<string>7798f0108bf85f0f9a3149d4bedae99c</string>
+<key>KAKAO_APP_SCHEME</key>
+<string>LSApplicationQueriesSchemes</string>
+<key>LSApplicationQueriesSchemes</key>
+<array>
+  <string>kakao0123456789</string>
+  <string>kakaokompassauth</string>
+  <string>storykompassauth</string>
+  <string>kakaolink</string>
+</array>
+
 </dict>
 </plist>

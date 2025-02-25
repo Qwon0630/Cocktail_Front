@@ -7,11 +7,13 @@ import { SafeAreaView, StatusBar, StyleSheet, View, ActivityIndicator, useColorS
 import OnboardingScreen from "./screens/OnboardingScreen";
 import LoginScreen from "./screens/Login";
 import MapsScreen from"./screens/Maps";
+import SearchScreen from './screens/SearchScreen'
 
 type RootStackParamList = {
   Onboarding: undefined;
   Login: undefined;
   Maps : undefined;
+  SearchScreen : undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -50,6 +52,7 @@ function App(): React.JSX.Element {
       <Stack.Navigator initialRouteName="Onboarding" screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="SearchScreen" component={SearchScreen}/>
         <Stack.Screen name="Maps" component={MapsScreen}/>
       </Stack.Navigator>
     </NavigationContainer>
