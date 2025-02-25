@@ -8,6 +8,7 @@ import Geolocation from "react-native-geolocation-service";
 import { request, PERMISSIONS, RESULTS } from "react-native-permissions";
 import "react-native-get-random-values";
 import RecommendationIntroScreen from "./RecommendationIntroScreen";
+import CocktailBookScreen from "./CocktailBookScreen";
 
 const GOOGLE_PLACES_API_KEY = "AIzaSyC0JEHhyV_duAla3PxCbQECtpxG17u1LnI"; // 여기에 Google Places API Key 입력
 
@@ -142,12 +143,6 @@ const showLocationPermissionAlert = () => {
     </View>
   );
 };
-
-const CocktailBookScreen = () => (
-  <View style={styles.screen}>
-    <FontAwesome name="book" size={24} color="black" />
-  </View>
-);
 const MyPageScreen = () => (
   <View style={styles.screen}>
     <FontAwesome name="user" size={24} color="black" />

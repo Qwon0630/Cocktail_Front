@@ -11,6 +11,7 @@ import RecommendationIntroScreen from "./screens/RecommendationIntroScreen";
 import RecommendationFlowScreen from "./screens/RecommendationFlowScreen";
 import LoadingScreen from "./screens/LoadingScreen";
 import ResultScreen from "./screens/ResultScreen";
+import CocktailBookScreen from "./screens/CocktailBookScreen";
 
 type RootStackParamList = {
   Onboarding: undefined;
@@ -62,6 +63,7 @@ const App: React.FC = () => {
         <Stack.Screen name="RecommendationFlow" component={RecommendationFlowScreen} />
         <Stack.Screen name="LoadingScreen" component={LoadingScreen} />
         <Stack.Screen name="ResultScreen" component={ResultScreen} />
+        <Stack.Screen name="CocktailBookScreen" component={CocktailBookScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
