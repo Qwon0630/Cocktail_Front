@@ -72,10 +72,13 @@ def enableProguardInReleaseBuilds = false
  */
 def jscFlavor = 'org.webkit:android-jsc:+'
 
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
+
+    
 
     namespace "com.cocktail_front"
     defaultConfig {
@@ -108,10 +111,12 @@ android {
 }
 
 dependencies {
+     implementation("com.navercorp.nid:oauth:5.4.0")
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
+        implementation ("com.navercorp.nid:oauth:5.4.0")
     } else {
         implementation jscFlavor
     }

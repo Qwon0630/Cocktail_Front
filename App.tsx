@@ -1,22 +1,9 @@
+// App.tsx
 import React, { useEffect, useState } from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator, StackScreenProps } from "@react-navigation/stack";
-import SplashScreen from "react-native-splash-screen";
+import { StyleSheet, View, ActivityIndicator, useColorScheme } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { SafeAreaView, StatusBar, StyleSheet, View, ActivityIndicator, useColorScheme } from "react-native";
-import OnboardingScreen from "./screens/OnboardingScreen";
-import LoginScreen from "./screens/Login";
-import MapsScreen from"./screens/Maps";
-import SearchScreen from './screens/SearchScreen'
-
-type RootStackParamList = {
-  Onboarding: undefined;
-  Login: undefined;
-  Maps : undefined;
-  SearchScreen : undefined;
-};
-
-const Stack = createStackNavigator<RootStackParamList>();
+import SplashScreen from "react-native-splash-screen";
+import Navigation from "./src/Navigation/Navigation";
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === "dark";
@@ -34,6 +21,7 @@ function App(): React.JSX.Element {
 
     checkOnboarding();
 
+    // SplashScreen 숨기기
     setTimeout(() => {
       SplashScreen.hide();
     }, 2000);
@@ -47,16 +35,7 @@ function App(): React.JSX.Element {
     );
   }
 
-  return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Onboarding" screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="SearchScreen" component={SearchScreen}/>
-        <Stack.Screen name="Maps" component={MapsScreen}/>
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
+  return <Navigation />;
 }
 
 const styles = StyleSheet.create({

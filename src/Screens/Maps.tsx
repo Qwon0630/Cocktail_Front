@@ -1,5 +1,5 @@
 import React, { forwardRef, useRef, useMemo } from "react";
-import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { View, StyleSheet, Text, TouchableOpacity,Image,ImageSourcePropType } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -8,6 +8,8 @@ import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplet
 import { useNavigation } from "@react-navigation/native";
 import 'react-native-get-random-values';
 import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
+import theme from "../assets/styles/theme";
+import BottomSheetBackground from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheetBackground";
 
 const GOOGLE_PLACES_API_KEY = "AIzaSyDeWHr3QIavBa4RGYwZly8h0sNTfLmQ";
 
@@ -20,6 +22,31 @@ type RootStackParamList = {
   MapsTab: undefined;
   SearchScreen: undefined;
 };
+type myBarList = {
+  listId : Number,
+  title : String, 
+  barAdress : String,
+  image : ImageSourcePropType,
+  hashtageList : String[],
+}
+const bars: myBarList[] = [
+  {
+    listId : 1,
+    title: "Label",
+    barAdress: "거리",
+    image: require("../assets/drawable/barExample.png"),
+    hashtageList: ["#칵테일 명", "#칵테일 명", "#다른 주류 명","#안주 명"]
+  },
+  {
+    listId : 2,
+    title: "Label",
+    barAdress: "거리",
+    image: require("../assets/drawable/barExample.png"),
+    hashtageList: ["#칵테일 명", "#칵테일 명", "#다른 주류 명","#안주 명"]
+  },
+  
+];
+
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator();
@@ -32,17 +59,20 @@ const MapScreen = () => {
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["25%", "50%", "90%"], []);
 
-  // 예시 데이터 (근처 칵테일 바 목록)
-  const dummyBars = [
-    { id: "1", name: "칵테일 바 명", distance: "100m" },
-    { id: "2", name: "칵테일 바 명2", distance: "200m" },
-    { id: "3", name: "칵테일 바 명3", distance: "300m" },
-  ];
 
-  const renderBarItem = ({ item }: { item: typeof dummyBars[0] }) => (
+  const renderBarItem = ({ item }: { item: myBarList }) => (
     <TouchableOpacity style={styles.itemContainer}>
-      <Text style={styles.itemTitle}>{item.name}</Text>
-      <Text style={styles.itemDistance}>{item.distance}</Text>
+      <Image style= {styles.itemImage} source= {item.image}/>
+        <View style={styles.textContainer}>
+      <Text style={styles.itemTitle}>{item.title}</Text>
+      <Text style={styles.itemDistance}>{item.barAdress}</Text>
+      <Text style={{color:"#B9B6AD", fontSize : 12}}>인기메뉴</Text>
+      <View style={styles.hashtagContainer}>
+        {item.hashtageList.map((tag, idx) => (
+          <Text key={idx} style={styles.hashtag}>{tag}</Text>
+        ))}
+      </View>
+      </View>
     </TouchableOpacity>
   );
 
@@ -50,7 +80,7 @@ const MapScreen = () => {
     <View style={styles.container}>
       {/* 검색 스타일 버튼 */}
       <TouchableOpacity
-        style={styles.searchButton}
+        style={[styles.searchButton]}
         onPress={() => navigation.navigate("SearchScreen" as never)}
       >
         <Text style={styles.searchButtonText}>검색</Text>
@@ -82,15 +112,15 @@ const MapScreen = () => {
         index={0} // 초기 스냅 포인트: 25%
         snapPoints={snapPoints}
         enablePanDownToClose={false}
+        backgroundStyle={{ backgroundColor: theme.background }}
       >
         <View style={styles.sheetHeader}>
-          <Text style={styles.sheetTitle}>근처 칵테일 바</Text>
+        
         </View>
         <BottomSheetFlatList
-          data={dummyBars}
-          keyExtractor={(item) => item.id}
+          data={bars} 
+          keyExtractor={(item) => item.listId.toString()} 
           renderItem={renderBarItem}
-          contentContainerStyle={styles.sheetContent}
         />
       </BottomSheet>
     </View>
@@ -161,29 +191,60 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     height: 40,
     borderRadius: 5,
-    backgroundColor: "#fff",
+    backgroundColor: theme.background,
     justifyContent: "center",
     paddingHorizontal: 10,
     zIndex: 2,
   },
   searchButtonText: { fontSize: 16, color: "#999" },
   sheetHeader: {
+    backgroundColor: "#FFFCF3",
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    
   },
   sheetTitle: { fontSize: 16, fontWeight: "bold" },
-  sheetContent: { paddingHorizontal: 16, paddingVertical: 8 },
+
   itemContainer: {
-    backgroundColor: "#fff",
-    marginBottom: 8,
-    borderRadius: 6,
-    padding: 10,
-    elevation: 2,
+    width : 375,
+    height : 156,
+    marginTop : 16,
+    marginLeft : 16,
+    backgroundColor: theme.background,
+    flexDirection : "row",
+    
   },
-  itemTitle: { fontSize: 14, fontWeight: "bold", marginBottom: 4 },
-  itemDistance: { fontSize: 12, color: "#666" },
+  textContainer: {
+    marginLeft : 12,
+    width : 168,
+    height : 48,
+    gap : 8
+  },
+  itemImage : {
+    width : 126,
+    height : 156
+  },
+  hashtagContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginTop: 8,
+    width: 197,       
+    height: 50,       
+    maxHeight: 52,    
+    gap: 6,           
+  },
+  hashtag: {
+    backgroundColor: "#F3EFE6",
+    color : "#7D7A6F",
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+    fontSize : 12,
+    textAlign: "center",
+    marginBottom: 4,
+  },
+  itemTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 4 },
+  itemDistance: { fontSize: 14, color: "#7D7A6F" },
 });
 
 export default MapsScreen;

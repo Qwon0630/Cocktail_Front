@@ -1,12 +1,12 @@
 import React, {useEffect,useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { StackScreenProps } from "@react-navigation/stack";
-// import NaverLogin from '@react-native-seoul/naver-login';
+// import NaverLogin from "@react-native-seoul/naver-login";
 // import type {
 //   GetProfileResponse,
 //   NaverLoginResponse,
-// } from '@react-native-seoul/naver-login';
-import  * as KakaoLogin from '@react-native-seoul/kakao-login';
+// } from "@react-native-seoul/naver-login";
+import  * as KakaoLogin from "@react-native-seoul/kakao-login";
  
   const consumerKey = 'pjSp0u95mvc6Ufq_TQbP';
   const consumerSecret = 'xD2ZRcw_px';
@@ -54,7 +54,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
         <Image source={require('../assets/naver_icon.png')} />
         </TouchableOpacity> */}
     <TouchableOpacity onPress={() => kakaologin()} style={{ flexDirection: 'row', alignItems: 'center' }}>
-    <Image source={require('../assets/kakao_icon.png')}  />
+    <Image source={require('../assets/drawable/kakao_icon.png')}  />
     
     </TouchableOpacity>
       <Text onPress={() => navigation.navigate("Maps")}>비회원 로그인</Text>

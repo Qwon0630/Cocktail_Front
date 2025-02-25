@@ -6,9 +6,11 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
+  StatusBar,
 } from "react-native";
 import { StackScreenProps } from "@react-navigation/stack";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import theme from "../assets/styles/theme";
 
 // RootStack 타입 정의 (SearchScreen 및 ResultScreen 혹은 이전 화면 전환용)
 type RootStackParamList = {
@@ -28,9 +30,13 @@ const SearchScreen: React.FC<SearchScreenProps> = ({ navigation }) => {
   };
 
   return (
+
     <View style={styles.container}>
+      {/* 시스템 영역, 색상 및 아이콘 표시 변경 */}
+      <StatusBar barStyle="dark-content" backgroundColor={theme.background} />
+
       {/* 상단 헤더 영역: 뒤로가기 아이콘과 검색 입력창을 같은 줄에 배치 */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: theme.background }]}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
@@ -38,14 +44,15 @@ const SearchScreen: React.FC<SearchScreenProps> = ({ navigation }) => {
           <FontAwesome name="arrow-left" size={20} color="#007BFF" />
         </TouchableOpacity>
         <TextInput
-          style={styles.searchInput}
-          placeholder="입력 혹은 검색어"
-          placeholderTextColor="#999"
+          style={[styles.searchInput, {backgroundColor : "#F3EFE6"}]}
+          
+          placeholder="가게 또는 메뉴 명을 입력해주세요."
+          placeholderTextColor="#B9B6AD"
         />
       </View>
 
       {/* 스크롤 영역: 추천 검색어와 최근 검색어 목록 */}
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, {backgroundColor :theme.background}]}>
         <Text style={styles.sectionTitle}>추천 검색어</Text>
         {recommendedKeywords.map((keyword, index) => (
           <TouchableOpacity
@@ -56,7 +63,7 @@ const SearchScreen: React.FC<SearchScreenProps> = ({ navigation }) => {
             <Text style={styles.keywordText}>{keyword}</Text>
           </TouchableOpacity>
         ))}
-        <Text style={[styles.sectionTitle, { marginTop: 24 }]}>최근 검색</Text>
+        <Text style={[styles.sectionTitle, { marginTop: 24 }]}>최근 검색어</Text>
         {recentSearches.map((search, index) => (
           <TouchableOpacity
             key={index}
@@ -76,7 +83,7 @@ export default SearchScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: theme.background,
   },
   // 상단 헤더 영역: 뒤로가기 아이콘과 검색 입력창을 한 줄에 배치
   header: {
@@ -90,12 +97,14 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   searchInput: {
-    flex: 1,
-    height: 35,
-    backgroundColor: "#fff",
-    borderRadius: 4,
-    paddingHorizontal: 10,
-    fontSize: 14,
+    flex : 1,
+    height : 48,
+    borderRadius : 8,
+    paddingTop : 10,
+    paddingRight : 12,
+    paddingBottom : 10,
+    marginBottom : 28,
+    paddingLeft : 12
   },
   scrollContent: {
     paddingHorizontal: 16,

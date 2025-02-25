@@ -7,4 +7,7 @@
 # For more details, see
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
+-keep public class com.navercorp.nid.** { *; }
+
+
 # Add any project specific keep options here:
