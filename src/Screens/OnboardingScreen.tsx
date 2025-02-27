@@ -130,11 +130,12 @@ const styles = StyleSheet.create({
     marginTop: heightPercentage(47),
   },
   text: {
+    
     color : "#7D7A6F",
     fontSize: fontPercentage(16),
     textAlign: "center",
-    marginTop: heightPercentage(10),
-    marginBottom: heightPercentage(30),
+    marginTop : heightPercentage(4),
+    marginHorizontal : widthPercentage(16)
   },
   paginationContainer: {
     flexDirection: "row",
@@ -143,15 +144,15 @@ const styles = StyleSheet.create({
     marginTop: heightPercentage(20),
   },
   dot: {
-    width: widthPercentage(7),
-    height: heightPercentage(9),
-    borderRadius: fontPercentage(5),
+    width: widthPercentage(8),
+    height: heightPercentage(8),
+    borderRadius: fontPercentage(50),
     marginHorizontal: widthPercentage(5),
   },
   activeDot: {
     backgroundColor: "black",
-    width: widthPercentage(20),
-    height: heightPercentage(9),
+    width: widthPercentage(8),
+    height: heightPercentage(8),
   },
   inactiveDot: {
     backgroundColor: "gray",

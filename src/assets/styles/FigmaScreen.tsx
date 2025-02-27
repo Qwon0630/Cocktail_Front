@@ -20,6 +20,6 @@ export function heightPercentage(height : number) : number {
 }
 
 export function fontPercentage(size : number): number{
-  const percentage = size*0.135
+  const percentage = size*0.13
   return responsiveFontSize(percentage)
 }
