@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { StackScreenProps } from "@react-navigation/stack";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import theme from "../assets/styles/theme";
+import theme from "../assets/styles/theme";
 
 // RootStack 타입 정의 (SearchScreen 및 ResultScreen 혹은 이전 화면 전환용)
 type RootStackParamList = {

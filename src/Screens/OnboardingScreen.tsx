@@ -3,7 +3,7 @@ import { View, Text, Image, StyleSheet, Animated, Dimensions, StatusBar } from "
 import AppIntroSlider from "react-native-app-intro-slider";
 import { StackScreenProps } from "@react-navigation/stack";
 import { widthPercentage, heightPercentage, fontPercentage } from "../assets/styles/FigmaScreen";
-import theme from "../assets/styles/theme";
+import theme from "../assets/styles/theme";
 type RootStackParamList = {
   Onboarding: undefined;
   Login: undefined;
