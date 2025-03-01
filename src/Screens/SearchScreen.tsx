@@ -11,11 +11,12 @@ import {
 import { StackScreenProps } from "@react-navigation/stack";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import theme from "../assets/styles/theme";
+import { widthPercentage, heightPercentage, fontPercentage } from "../assets/styles/FigmaScreen";
 
 // RootStack 타입 정의 (SearchScreen 및 ResultScreen 혹은 이전 화면 전환용)
 type RootStackParamList = {
   SearchScreen: undefined;
-  ResultScreen: undefined;
+  Maps: { searchCompleted?: boolean };
 };
 
 type SearchScreenProps = StackScreenProps<RootStackParamList, "SearchScreen">;
@@ -24,9 +25,9 @@ const recommendedKeywords = ["추천 검색어1", "추천 검색어2", "추천 �
 const recentSearches = ["검색어 1", "검색어 2"];
 
 const SearchScreen: React.FC<SearchScreenProps> = ({ navigation }) => {
-  // 검색어 항목 터치 시 원하는 동작 구현 (예: ResultScreen 전환)
   const handlePress = () => {
-    navigation.navigate("ResultScreen");
+    console.log("Navigating to Maps...");
+    navigation.navigate("Maps", { searchCompleted: true });
   };
 
   return (
@@ -35,19 +36,23 @@ const SearchScreen: React.FC<SearchScreenProps> = ({ navigation }) => {
       {/* 시스템 영역, 색상 및 아이콘 표시 변경 */}
       <StatusBar barStyle="dark-content" backgroundColor={theme.background} />
 
-      {/* 상단 헤더 영역: 뒤로가기 아이콘과 검색 입력창을 같은 줄에 배치 */}
       <View style={[styles.header, { backgroundColor: theme.background }]}>
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => navigation.goBack()}
+          onPress={() => navigation.navigate("Maps",{searchCompleted : false})}
         >
           <FontAwesome name="arrow-left" size={20} color="#007BFF" />
         </TouchableOpacity>
         <TextInput
           style={[styles.searchInput, {backgroundColor : "#F3EFE6"}]}
-          
           placeholder="가게 또는 메뉴 명을 입력해주세요."
           placeholderTextColor="#B9B6AD"
+          returnKeyType="done"
+          
+          onSubmitEditing={() => {
+            console.log("🔵 onSubmitEditing triggered!");
+            navigation.navigate("Maps", { searchCompleted: true });
+          }}
         />
       </View>
 
@@ -89,50 +94,52 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingHorizontal: widthPercentage(16),
+    paddingVertical: heightPercentage(10),
     backgroundColor: "#f0f0f0",
   },
   backButton: {
-    marginRight: 10,
+    width : widthPercentage(24),
+    height : heightPercentage(24),
+    marginTop : heightPercentage(40),
+    marginRight: widthPercentage(15),
   },
   searchInput: {
-    flex : 1,
-    height : 48,
+    paddingHorizontal : heightPercentage(12),
+    paddingVertical : widthPercentage(10),
+    backgroundColor : "#F3EFE6",
     borderRadius : 8,
-    paddingTop : 10,
-    paddingRight : 12,
-    paddingBottom : 10,
-    marginBottom : 28,
-    paddingLeft : 12
+    width : widthPercentage(309),
+    height : heightPercentage(48),
+    marginTop : heightPercentage(49)
   },
   scrollContent: {
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingHorizontal: widthPercentage(16),
+    paddingVertical: heightPercentage(16),
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: fontPercentage(16),
     fontWeight: "bold",
-    marginBottom: 8,
+    marginBottom: heightPercentage(8),
   },
   keywordButton: {
-    height: 40,
+    height: heightPercentage(40),
     justifyContent: "center",
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
   },
   keywordText: {
-    fontSize: 14,
+    fontSize: fontPercentage(14),
     color: "#333",
   },
   recentItem: {
-    height: 40,
+    height: heightPercentage(40),
     justifyContent: "center",
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
   },
   recentText: {
-    fontSize: 14,
+    fontSize: fontPercentage(14),
     color: "#555",
   },
 });

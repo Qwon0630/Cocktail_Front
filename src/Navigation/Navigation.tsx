@@ -4,14 +4,16 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import OnboardingScreen from "../Screens/OnboardingScreen";
 import LoginScreen from "../Screens/Login";
-import MapsScreen from "../Screens/Maps";
+import Maps from "../BottomTab/Maps";
 import SearchScreen from "../Screens/SearchScreen";
+import BottomTabNavigator from "./BottomTabNavigator";
 
 export type RootStackParamList = {
   Onboarding: undefined;
   Login: undefined;
-  Maps: undefined;
+  Maps: { searchCompleted?: boolean };
   SearchScreen: undefined;
+  BottomTabNavigator : undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -26,7 +28,8 @@ const Navigation: React.FC = () => {
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="SearchScreen" component={SearchScreen} />
-        <Stack.Screen name="Maps" component={MapsScreen} />
+        <Stack.Screen name="Maps" component={Maps} />
+        <Stack.Screen name="BottomTabNavigator" component={BottomTabNavigator} />
       </Stack.Navigator>
     </NavigationContainer>
   );

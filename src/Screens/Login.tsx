@@ -16,7 +16,7 @@ import  * as KakaoLogin from "@react-native-seoul/kakao-login";
 type RootStackParamList = {
   Onboarding: undefined;
   Login: undefined;
-  Maps : undefined;
+  BottomTabNavigator : undefined;
 };
 
 type LoginScreenProps = StackScreenProps<RootStackParamList, "Login">;
@@ -57,7 +57,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
     <Image source={require('../assets/drawable/kakao_icon.png')}  />
     
     </TouchableOpacity>
-      <Text onPress={() => navigation.navigate("Maps")}>비회원 로그인</Text>
+      <Text style={styles.button}onPress={() => navigation.navigate("BottomTabNavigator")}>비회원 로그인</Text>
     </View>
   );
 };
@@ -94,6 +94,7 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
         paddingHorizontal: 24,
         borderRadius: 8,
+        marginTop : 10,
       },
       buttonText: {
         fontSize: 18,
