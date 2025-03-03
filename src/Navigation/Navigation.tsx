@@ -7,6 +7,9 @@ import LoginScreen from "../Screens/Login";
 import Maps from "../BottomTab/Maps";
 import SearchScreen from "../Screens/SearchScreen";
 import BottomTabNavigator from "./BottomTabNavigator";
+import RecommendationFlowScreen from "../Screens/RecommendationFlowScreen";
+import LoadingScreen from "../Screens/LoadingScreen";
+import ResultScreen from "../Screens/ResultScreen";
 
 export type RootStackParamList = {
   Onboarding: undefined;
@@ -14,6 +17,9 @@ export type RootStackParamList = {
   Maps: { searchCompleted?: boolean };
   SearchScreen: undefined;
   BottomTabNavigator : undefined;
+  RecommendationFlow: undefined;
+  LoadingScreen: undefined;
+  ResultScreen: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -30,6 +36,9 @@ const Navigation: React.FC = () => {
         <Stack.Screen name="SearchScreen" component={SearchScreen} />
         <Stack.Screen name="Maps" component={Maps} />
         <Stack.Screen name="BottomTabNavigator" component={BottomTabNavigator} />
+        <Stack.Screen name="RecommendationFlow" component={RecommendationFlowScreen} />
+        <Stack.Screen name="LoadingScreen" component={LoadingScreen} />
+        <Stack.Screen name="ResultScreen" component={ResultScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
