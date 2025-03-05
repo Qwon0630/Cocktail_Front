@@ -1,8 +1,8 @@
 import React, { useRef, useMemo,useState  } from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import BottomSheet, { BottomSheetSectionList } from "@gorhom/bottom-sheet";
-import MyListSheet from "../BottomSheet/MyListSheet";
-import RegionSheet from "./RegionSheet";
+import MyListSheet from "../BottomSheet/MyListSheetContent";
+import RegionSheet from "../BottomSheet/RegionSheetContent";
 
 import theme from "../assets/styles/theme";
 import { widthPercentage, heightPercentage, fontPercentage } from "../assets/styles/FigmaScreen";
@@ -167,6 +167,7 @@ const styles = StyleSheet.create({
     fontSize: fontPercentage(18),
     fontWeight: '700',
     color: '#2D2D2D',
+
     marginRight : widthPercentage(12),
    
   },
@@ -186,7 +187,7 @@ const styles = StyleSheet.create({
     borderRadius : 20,
     backgroundColor : "#F3EFE6",
     alignSelf: "flex-start",
-    paddingVertical: heightPercentage(6),
+    paddingVertical: heightPercentage(8),
     paddingHorizontal: widthPercentage(12),
   }
   ,

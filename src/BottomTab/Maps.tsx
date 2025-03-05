@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { StackScreenProps } from "@react-navigation/stack";
-import { RouteProp, useRoute, useNavigation } from "@react-navigation/native";
-import { View, StyleSheet, StatusBar, Text, TouchableOpacity,TextInput } from "react-native";
+import { View, StyleSheet, StatusBar, Text, TouchableOpacity, TextInput } from "react-native";
 import SearchBar from "../Components/SearchBar";
 import CustomMapView from "../Components/CustomMapView";
 import SearchSheet from "../BottomSheet/SearchSheet";
@@ -24,9 +23,11 @@ const Maps: React.FC<MapsProps> = ({ navigation, route }) => {
     }
   }, [route.params?.searchCompleted]);
 
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" translucent backgroundColor="transparent" />
+
 
       {isSearchCompleted ? (
         <View style={styles.resultHeader}>
@@ -34,28 +35,25 @@ const Maps: React.FC<MapsProps> = ({ navigation, route }) => {
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Text style={styles.buttonText}>🔙</Text>
           </TouchableOpacity>
-           {/* 검색 결과 화면 */}
-          <TextInput
-                    style={[styles.searchButton, {backgroundColor : "white"}]}
-                    placeholder="입력한 검색어"
-                    placeholderTextColor="black"
-                    returnKeyType="done"
-                    onSubmitEditing={() => {
-                      navigation.navigate("Maps", { searchCompleted: true });
-                    }}
-                  />
 
+          {/* 검색 결과 화면 */}
+          <TextInput
+            style={[styles.searchButton, { backgroundColor: "white" }]}
+            placeholder="입력한 검색어"
+            placeholderTextColor="black"
+            returnKeyType="done"
+            onSubmitEditing={() => {
+              navigation.navigate("Maps", { searchCompleted: true });
+            }}
+          />
           {/* 검색 초기화 버튼 */}
-          <TouchableOpacity
-            style={styles.clearButton}
-            onPress={() => navigation.navigate("SearchScreen")}
-          >
+          <TouchableOpacity style={styles.clearButton} onPress={() => navigation.navigate("SearchScreen")}>
             <Text style={styles.buttonText}>❌</Text>
-            
           </TouchableOpacity>
         </View>
       ) : (
         <SearchBar />
+        
       )}
 
       {/* 지도 */}
@@ -69,8 +67,7 @@ const Maps: React.FC<MapsProps> = ({ navigation, route }) => {
           }}
         />
       </View>
-
-      <SearchSheet />
+       <SearchSheet/>
     </View>
   );
 };
@@ -80,6 +77,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.background,
   },
+
   mapContainer: {
     flex: 1,
   },
@@ -96,28 +94,26 @@ const styles = StyleSheet.create({
     backgroundColor: theme.background,
     paddingHorizontal: widthPercentage(10),
     zIndex: 10,
-    marginBottom : heightPercentage(12),
-    borderWidth : widthPercentage(1),
-    borderColor : "#E4DFD8"
-    
+    marginBottom: heightPercentage(12),
+    borderWidth: widthPercentage(1),
+    borderColor: "#E4DFD8",
   },
   backButton: {
-    marginBottom : heightPercentage(10),
-    width : widthPercentage(24),
-    height : heightPercentage(24),
-    marginLeft : widthPercentage(16),
-    marginRight : widthPercentage(10),
-   
+    marginBottom: heightPercentage(10),
+    width: widthPercentage(24),
+    height: heightPercentage(24),
+    marginLeft: widthPercentage(16),
+    marginRight: widthPercentage(10),
   },
   clearButton: {
     padding: widthPercentage(10),
     borderRadius: widthPercentage(8),
   },
   buttonText: {
-    marginLeft : widthPercentage(5),
-    marginBottom : heightPercentage(10),
-    width : widthPercentage(24),
-    height : heightPercentage(24),
+    marginLeft: widthPercentage(5),
+    marginBottom: heightPercentage(10),
+    width: widthPercentage(24),
+    height: heightPercentage(24),
   },
 });
 
