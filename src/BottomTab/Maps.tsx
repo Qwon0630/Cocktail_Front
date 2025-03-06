@@ -3,31 +3,37 @@ import { StackScreenProps } from "@react-navigation/stack";
 import { View, StyleSheet, StatusBar, Text, TouchableOpacity, TextInput } from "react-native";
 import SearchBar from "../Components/SearchBar";
 import CustomMapView from "../Components/CustomMapView";
-import SearchSheet from "../BottomSheet/SearchSheet";
+import BaseBottomSheet from "../BottomSheet/BaseBottomSheet";
 import theme from "../assets/styles/theme";
 import { heightPercentage, widthPercentage, fontPercentage } from "../assets/styles/FigmaScreen";
+import MyListSheetContent from "../BottomSheet/MyListSheetContent";
 
 type RootStackParamList = {
   SearchScreen: undefined;
-  Maps: { searchCompleted?: boolean };
+  Maps: { searchCompleted?: boolean; setSelectedRegions? : string[] };
 };
 
 type MapsProps = StackScreenProps<RootStackParamList, "Maps">;
 
 const Maps: React.FC<MapsProps> = ({ navigation, route }) => {
   const [isSearchCompleted, setIsSearchCompleted] = useState(false);
+  const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
 
   useEffect(() => {
     if (route.params?.searchCompleted) {
       setIsSearchCompleted(true);
     }
-  }, [route.params?.searchCompleted]);
-
+    if (route.params?.setSelectedRegions) {
+      console.log("✅ selectedRegions 값이 넘어옴:", route.params.setSelectedRegions);
+      setSelectedRegions(route.params.setSelectedRegions);
+    }
+  }, [route.params?.searchCompleted, route.params?.setSelectedRegions]);
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" translucent backgroundColor="transparent" />
 
+      <Text style={styles.debugText}>디버깅: {selectedRegions.length > 0 ? selectedRegions.join(", ") : "선택된 지역 없음"}</Text>
 
       {isSearchCompleted ? (
         <View style={styles.resultHeader}>
@@ -67,7 +73,8 @@ const Maps: React.FC<MapsProps> = ({ navigation, route }) => {
           }}
         />
       </View>
-       <SearchSheet/>
+
+      {selectedRegions.length > 0 ? <MyListSheetContent selectedRegions={selectedRegions} /> : <BaseBottomSheet />}
     </View>
   );
 };
@@ -76,6 +83,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.background,
+  },
+  debugText: {
+    color: "red", // 디버깅 UI 강조
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginTop: 10,
   },
 
   mapContainer: {

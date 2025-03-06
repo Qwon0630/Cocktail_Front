@@ -7,12 +7,14 @@ import LoginScreen from "../Screens/Login";
 import Maps from "../BottomTab/Maps";
 import SearchScreen from "../Screens/SearchScreen";
 import BottomTabNavigator from "./BottomTabNavigator";
+import RegionSelectScreen from "../Screens/RegionSelectScreen";
 
 export type RootStackParamList = {
   Onboarding: undefined;
   Login: undefined;
-  Maps: { searchCompleted?: boolean };
+  Maps: { searchCompleted?: boolean; setSelectedRegions?: string[] };
   SearchScreen: undefined;
+  RegionSelectScreen : undefined;
   BottomTabNavigator : undefined;
 };
 
@@ -28,6 +30,7 @@ const Navigation: React.FC = () => {
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="SearchScreen" component={SearchScreen} />
+        <Stack.Screen name="RegionSelectScreen" component={RegionSelectScreen}/>
         <Stack.Screen name="Maps" component={Maps} />
         <Stack.Screen name="BottomTabNavigator" component={BottomTabNavigator} />
       </Stack.Navigator>
