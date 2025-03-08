@@ -73,64 +73,76 @@ const typingBubbleHeights = [
   useEffect(() => {
     if (currentStep === -1) {
         setIsTyping(true);
-        typingBubbleOpacity.setValue(1);
-        
-        Animated.sequence([
-            Animated.timing(typingBubbleOpacity, {
-                toValue: 1,
-                duration: 500,
-                useNativeDriver: true,
-            }),
-            Animated.delay(1000),
-            Animated.timing(typingBubbleOpacity, {
-                toValue: 0,
-                duration: 500,
-                useNativeDriver: true,
-            }),
-        ]).start(() => {
-            setCurrentStep(0);
-            setIsTyping(false);
+        typingBubbleOpacity.setValue(0); // 초기값을 0으로 설정하여 페이드인 시작
+      
+        fadeInValues[0].setValue(0);
+        // 페이드인 애니메이션
+        Animated.timing(typingBubbleOpacity, {
+            toValue: 1,
+            duration: 1000,
+            useNativeDriver: true,
+        }).start(() => {
+            Animated.sequence([
+                Animated.delay(1000),
+                Animated.timing(typingBubbleOpacity, {
+                    toValue: 0,
+                    duration: 500,
+                    useNativeDriver: true,
+                }),
+            ]).start(() => {
+                setCurrentStep(0);
+                setIsTyping(false);
 
-            fadeInValues[0].setValue(0);
-            Animated.timing(fadeInValues[0], {
-                toValue: 1,
-                duration: 500,
-                useNativeDriver: true,
-            }).start();
+                fadeInValues[0].setValue(0);
+                Animated.timing(fadeInValues[0], {
+                    toValue: 1,
+                    duration: 500,
+                    useNativeDriver: true,
+                }).start();
+            });
         });
     }
 }, []);
 
 
+
 useEffect(() => {
     if (currentStep >= 0 && currentStep < questions.length && isTyping) {
-        typingBubbleOpacity.setValue(1);
-        Animated.sequence([
-            Animated.timing(typingBubbleOpacity, {
-                toValue: 1,
-                duration: 500,
-                useNativeDriver: true,
-            }),
-            Animated.delay(1000),
-            Animated.timing(typingBubbleOpacity, {
-                toValue: 0,
-                duration: 500,
-                useNativeDriver: true,
-            }),
-        ]).start(() => {
-            if (currentStep < questions.length) {
-                fadeInValues[currentStep].setValue(0);
-                Animated.timing(fadeInValues[currentStep], {
-                    toValue: 1,
-                    duration: 500,
-                    useNativeDriver: true,
-                }).start(() => {
-                    setIsTyping(false);
-                });
-            } else {
-                setIsTyping(false);
-            }
+        typingBubbleOpacity.setValue(0);
+
+        Animated.timing(typingBubbleOpacity, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }).start(() => {
+            Animated.sequence([
+              Animated.timing(typingBubbleOpacity, {
+                  toValue: 1,
+                  duration: 500,
+                  useNativeDriver: true,
+              }),
+              Animated.delay(1000),
+              Animated.timing(typingBubbleOpacity, {
+                  toValue: 0,
+                  duration: 500,
+                  useNativeDriver: true,
+              }),
+          ]).start(() => {
+              if (currentStep < questions.length) {
+                  fadeInValues[currentStep].setValue(0);
+                  Animated.timing(fadeInValues[currentStep], {
+                      toValue: 1,
+                      duration: 500,
+                      useNativeDriver: true,
+                  }).start(() => {
+                      setIsTyping(false);
+                  });
+              } else {
+                  setIsTyping(false);
+              }
+          });
         });
+        
     }
 }, [currentStep, isTyping]);
 
