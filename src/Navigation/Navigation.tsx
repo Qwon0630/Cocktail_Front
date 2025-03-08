@@ -8,7 +8,7 @@ import Maps from "../BottomTab/Maps";
 import SearchScreen from "../Screens/SearchScreen";
 import BottomTabNavigator from "./BottomTabNavigator";
 import RegionSelectScreen from "../Screens/RegionSelectScreen";
-
+import CreateNewListScreen from "../Screens/CreateNewListScreen";
 export type RootStackParamList = {
   Onboarding: undefined;
   Login: undefined;
@@ -16,6 +16,7 @@ export type RootStackParamList = {
   SearchScreen: undefined;
   RegionSelectScreen : undefined;
   BottomTabNavigator : undefined;
+  CreateNewListScreen : undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -33,6 +34,7 @@ const Navigation: React.FC = () => {
         <Stack.Screen name="RegionSelectScreen" component={RegionSelectScreen}/>
         <Stack.Screen name="Maps" component={Maps} />
         <Stack.Screen name="BottomTabNavigator" component={BottomTabNavigator} />
+        <Stack.Screen name="CreateNewListScreen" component={CreateNewListScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

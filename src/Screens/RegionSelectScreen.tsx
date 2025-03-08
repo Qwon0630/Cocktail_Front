@@ -1,69 +1,98 @@
-import React, { useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
-import { Checkbox } from 'react-native-paper';
+import React, { useState } from "react";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ScrollView, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { StackNavigationProp } from "@react-navigation/stack"; 
+import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../Navigation/Navigation";
+import { widthPercentage, heightPercentage, fontPercentage } from "../assets/styles/FigmaScreen";
+import theme from "../assets/styles/theme";
+
+
 const regions = [
-  '서울 전체', '강남/신논현/잠실', '청담/압구정/신사', '선릉/삼성', '논현/역삼/학동',
-  '서울고대/대학로', '대치/도곡/개포', '홍대/공덕/서촌', '서울역/명동/회현',
-  '왕십리/성수/천호', '신림/봉천', '독산/성수/서울숲/건대입구', '호텔/리조트/한강로',
-  '마곡/목동/구룡', '뚝섬/여의도/노량진', '마이타운/노원', '이태원/삼각지',
-  '서울대/사당/동작', '은평/북', '신도림/구로', '마포/공덕', '관서/기본', '수서/복정/양지'
+  "서울 전체", "강남/신논현/양재", "청담/압구정/신사", "선릉/삼성", "논현/반포/학동",
+  "서초/교대/방배", "대치/도곡/한티", "홍대/합정/신촌", "서울역/명동/회현",
+  "잠실/석촌/천호", "신당/왕십리", "뚝섬/성수/서울숲/건대입구", "종로/을지로/충정로",
+  "마곡/화곡/목동", "영등포/여의도/노량진", "미아/도봉/노원", "이태원/용산/삼각지",
+  "서울대/사당/동작", "은평/상암", "신도림/구로", "마포/공덕", "금천/가산", "수서/복정/장지"
 ];
+
 type NavigationProps = StackNavigationProp<RootStackParamList, "RegionSelectScreen">;
 
 const RegionSelectScreen = () => {
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   const navigation = useNavigation<NavigationProps>();
+
   const toggleRegion = (region: string) => {
-    if(region == '서울 전체') {
-      if(selectedRegions.includes(region)){
-        setSelectedRegions([]);
-      } else {
-        setSelectedRegions(regions.filter((r) => r ))
-      }
-    }else
-    setSelectedRegions((prev) =>
-      prev.includes(region) ? prev.filter((r) => r !== region) : [...prev, region]
-    );
+    if (region === "서울 전체") {
+      setSelectedRegions((prev) => (prev.includes(region) ? [] : [...regions]));
+    } else {
+      setSelectedRegions((prev) =>
+        prev.includes(region) ? prev.filter((r) => r !== region) : [...prev, region]
+      );
+    }
   };
+
   const resetSelection = () => {
     setSelectedRegions([]);
   };
 
   return (
     <View style={styles.container}>
-      {/* 상단 제목 */}
+      {/* 상단 네비게이션 바 */}
       <View style={styles.header}>
         <Text style={styles.title}>지역</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Text style={styles.closeText}>X</Text>
+        </TouchableOpacity>
       </View>
-
+      <View style={styles.ContentContainer}>
       {/* 지역 리스트 */}
+      <View style={styles.categorySection}>
+      <Text style={styles.categoryTitle}>서울</Text>
+    </View>
       <FlatList
         data={regions}
         keyExtractor={(item) => item}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.item} onPress={() => toggleRegion(item)}>
-            <Text style={styles.itemText}>{item}</Text>
-            <Checkbox
-              status={selectedRegions.includes(item) ? 'checked' : 'unchecked'}
-              onPress={() => toggleRegion(item)}
-            />
+          <TouchableOpacity style={styles.listItem} onPress={() => toggleRegion(item)}>
+            <Text style={[styles.itemText, selectedRegions.includes(item) && styles.itemCheckText]}>
+              {item}
+              </Text>
+            <TouchableOpacity onPress={() => toggleRegion(item)} style={[styles.checkbox, selectedRegions.includes(item) && styles.checked]}>
+              {selectedRegions.includes(item) && <Text style={styles.checkIcon}>✓</Text> }
+            </TouchableOpacity>
           </TouchableOpacity>
         )}
       />
+      </View>
+      
+
+      {/* 선택된 지역 태그 */}
+      {selectedRegions.length > 0 && (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tagContainer}>
+          {selectedRegions
+          .filter((region) => region !== "서울 전체")
+          .map((region, index) => (
+            <View key={index} style={styles.tag}>
+              <Text style={styles.tagText}>{region}</Text>
+              <TouchableOpacity onPress={() => toggleRegion(region)} >
+                <Text style={styles.removeText}>X</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </ScrollView>
+      )}
 
       {/* 하단 버튼 */}
       <View style={styles.footer}>
         <TouchableOpacity style={styles.resetButton} onPress={resetSelection}>
-          <Text style={styles.buttonText}>초기화</Text>
+          <Text style={styles.resetButtonText}>↻ 초기화</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.applyButton}
-       onPress={() => {
-        const filteredRegions = selectedRegions.filter(region => region !== "서울 전체");
-        navigation.navigate("Maps", { selectedRegions: filteredRegions });
-      }}
+        <TouchableOpacity
+          style={styles.applyButton}
+          onPress={() => {
+            const filteredRegions = selectedRegions.filter((region) => region !== "서울 전체");
+            navigation.navigate("Maps", { selectedRegions: filteredRegions });
+          }}
         >
           <Text style={styles.buttonText}>적용하기</Text>
         </TouchableOpacity>
@@ -73,15 +102,171 @@ const RegionSelectScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FAF7F2' },
-  header: { alignItems: 'center', padding: 16, backgroundColor: '#FFF' },
-  title: { fontSize: 18, fontWeight: 'bold' },
-  item: { flexDirection: 'row', justifyContent: 'space-between', padding: 16, borderBottomWidth: 1, borderColor: '#EEE' },
-  itemText: { fontSize: 16 },
-  footer: { flexDirection: 'row', justifyContent: 'space-between', padding: 16, backgroundColor: '#FFF' },
-  resetButton: { flex: 1, padding: 12, alignItems: 'center', borderRadius: 8, backgroundColor: '#DDD', marginRight: 8 },
-  applyButton: { flex: 1, padding: 12, alignItems: 'center', borderRadius: 8, backgroundColor: '#4B286D' },
-  buttonText: { fontSize: 16, color: '#FFF' },
+  container: { 
+    flex: 1, 
+    backgroundColor: "#FAF7F2" 
+  },
+
+  RegiondataList : {
+    flexDirection : "row"
+  },
+  ContentContainer: {
+    flexDirection: "row", // 왼쪽(카테고리) + 오른쪽(리스트) 정렬
+    backgroundColor: "#FFFCF3", // 전체 배경색
+    height : heightPercentage(543)
+  },
+  categorySection: {
+    width: widthPercentage(105), 
+    backgroundColor: "#EDE7DD", 
+    alignItems: "center",
+  },
+  categoryTitle: {
+    paddingHorizontal : widthPercentage(40),
+    paddingVertical : heightPercentage(10),
+    width : widthPercentage(105), 
+    height : heightPercentage(40),
+    fontSize: fontPercentage(14),
+    fontWeight: "bold",
+    color: "#2D2D2D",
+    backgroundColor : theme.background
+  },
+
+
+  // 상단 네비게이션 바
+  header: {
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "space-between",
+  paddingTop: heightPercentage(24), 
+  paddingHorizontal: widthPercentage(16), 
+  paddingBottom: heightPercentage(12), 
+  backgroundColor: "#FFFCF3", 
+  borderBottomColor: "#EEE",
+  borderBottomWidth: 1, 
+},
+  title: { fontSize: 18, fontWeight: "bold" },
+ 
+  closeText: { 
+    fontSize: fontPercentage(18.67),
+    marginRight : widthPercentage(8),
+    marginTop : heightPercentage(8),
+    color: "#2D2D2D" },
+
+  // 리스트 스타일
+  listItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 16,
+    backgroundColor : "#FFFCF3",
+    borderBottomWidth: 1,
+    borderColor: "#EEE",
+    alignItems: "center",
+  },
+  itemCheckText: { 
+    fontSize: fontPercentage(14),
+    color : "#21103C",
+    fontWeight : "500",
+  },
+  itemText: { 
+    fontSize: fontPercentage(14),
+    color : "#B9B6AD",
+    fontWeight : "500",
+  },
+
+  // 체크박스 스타일
+  checkbox: {
+    width: widthPercentage(20),
+    height: heightPercentage(20),
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: "#B9B6AD",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  checked: {
+    backgroundColor: "#21103C",
+    borderColor: "#21103C",
+    
+  },
+  checkIcon: {
+    fontSize: fontPercentage(8),
+    color : "#FFFFFF",
+    paddingTop : heightPercentage(2),
+    paddingLeft : widthPercentage(2),
+    fontWeight: "700",
+    marginBottom : heightPercentage(4)
+  },
+
+  // 선택된 지역 태그 스타일
+  tagContainer: {
+    backgroundColor : "#FFFCF3",
+    height : 52,
+    flexDirection: "row",
+    paddingHorizontal: 16,
+    marginVertical: 10,
+    marginLeft : 16,
+    marginRight : 8,
+    marginHorizontal : 8
+  },
+  tag: {
+    flexDirection: "row",
+    backgroundColor: "#FFFCF3",
+    borderRadius: 20,
+    borderWidth : 1,
+    borderColor : "#B9B6AD",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginRight: 8,
+    alignItems: "center",
+  },
+  tagText: {
+    fontSize: fontPercentage(14),
+    color: "#2D2D2D",
+    fontWeight : "500",
+    marginRight: widthPercentage(5),
+    marginHorizontal : heightPercentage(8)
+  },
+
+  removeText: {
+    fontSize: fontPercentage(13.33),
+    color: "#666",
+    fontWeight : "400"
+  },
+
+  // 하단 버튼 스타일
+  footer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 16,
+    backgroundColor: theme.background,
+  },
+  resetButton: {
+    width : widthPercentage(100),
+    height : heightPercentage(48),
+    paddingHorizontal : widthPercentage(16),
+    paddingVertical : heightPercentage(12),
+    alignItems: "center",
+    borderRadius: 8,
+    backgroundColor: "#E4DFD8",
+    marginRight: 8,
+  },
+  applyButton: {
+    flex: 1,
+    padding: 12,
+    alignItems: "center",
+    borderRadius: 8,
+    backgroundColor: "#21103C",
+  },
+  resetButtonText: {
+   
+    fontWeight : "700",
+    fontSize : fontPercentage(16),
+    color : "#7D7A6F",
+  },
+  buttonText: { 
+    fontSize: fontPercentage(16),
+    fontWeight : "700",
+    color: "#FFF" },
 });
 
 export default RegionSelectScreen;

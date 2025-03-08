@@ -6,11 +6,12 @@ import CustomMapView from "../Components/CustomMapView";
 import BaseBottomSheet from "../BottomSheet/BaseBottomSheet";
 import theme from "../assets/styles/theme";
 import { heightPercentage, widthPercentage, fontPercentage } from "../assets/styles/FigmaScreen";
-import MyListSheetContent from "../BottomSheet/MyListSheetContent";
+import SelectedRegions from "../BottomSheet/SelectedRegions";
+import SelectedRegionTags from "../Components/SelectedRegionTags";
 
 type RootStackParamList = {
   SearchScreen: undefined;
-  Maps: { searchCompleted?: boolean; setSelectedRegions? : string[] };
+  Maps: { searchCompleted?: boolean; selectedRegions? : string[] };
 };
 
 type MapsProps = StackScreenProps<RootStackParamList, "Maps">;
@@ -23,17 +24,18 @@ const Maps: React.FC<MapsProps> = ({ navigation, route }) => {
     if (route.params?.searchCompleted) {
       setIsSearchCompleted(true);
     }
-    if (route.params?.setSelectedRegions) {
-      console.log("✅ selectedRegions 값이 넘어옴:", route.params.setSelectedRegions);
-      setSelectedRegions(route.params.setSelectedRegions);
+    if (route.params?.selectedRegions) {
+      setSelectedRegions(route.params.selectedRegions);
     }
-  }, [route.params?.searchCompleted, route.params?.setSelectedRegions]);
+  }, [route.params?.searchCompleted, route.params?.selectedRegions]);
+
+  const handleRemoveRegion = (region: string) => {
+    setSelectedRegions((prevRegions) => prevRegions.filter((r) => r !== region));
+  };
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" translucent backgroundColor="transparent" />
-
-      <Text style={styles.debugText}>디버깅: {selectedRegions.length > 0 ? selectedRegions.join(", ") : "선택된 지역 없음"}</Text>
 
       {isSearchCompleted ? (
         <View style={styles.resultHeader}>
@@ -54,12 +56,13 @@ const Maps: React.FC<MapsProps> = ({ navigation, route }) => {
           />
           {/* 검색 초기화 버튼 */}
           <TouchableOpacity style={styles.clearButton} onPress={() => navigation.navigate("SearchScreen")}>
-            <Text style={styles.buttonText}>❌</Text>
+            <Text style={styles.buttonText}>X</Text>
           </TouchableOpacity>
         </View>
       ) : (
-        <SearchBar />
-        
+          <>
+
+      </>
       )}
 
       {/* 지도 */}
@@ -73,8 +76,22 @@ const Maps: React.FC<MapsProps> = ({ navigation, route }) => {
           }}
         />
       </View>
+      <View style={styles.searchContainer}>
+  
 
-      {selectedRegions.length > 0 ? <MyListSheetContent selectedRegions={selectedRegions} /> : <BaseBottomSheet />}
+  <SearchBar />
+
+  {selectedRegions.length > 0 && (
+    <View style={styles.tagsContainer}>
+      <SelectedRegionTags 
+        selectedRegions={selectedRegions} 
+        onRemoveRegion={handleRemoveRegion} 
+        
+      />
+    </View>
+  )}
+</View>
+      {selectedRegions.length > 0 ? <SelectedRegions selectedRegions={selectedRegions} /> : <BaseBottomSheet />}
     </View>
   );
 };
@@ -84,14 +101,18 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.background,
   },
-  debugText: {
-    color: "red", // 디버깅 UI 강조
-    fontSize: 16,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginTop: 10,
+  searchContainer: {
+    position: "absolute",
+    flexDirection: "column",
+    top: heightPercentage(50), 
+    left: widthPercentage(16),
+    right: widthPercentage(16),
+    zIndex: 10, 
   },
-
+  tagsContainer: {
+    flexDirection: "row", // 태그를 가로 정렬
+    marginTop: heightPercentage(8),
+  },
   mapContainer: {
     flex: 1,
   },
