@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/types";
+import { widthPercentage, heightPercentage, fontPercentage } from "../assets/styles/FigmaScreen";
 
 type LoadingScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -21,7 +22,7 @@ const LoadingScreen: React.FC<Props> = ({ navigation }) => {
       navigation.navigate("ResultScreen");
     }, 3000);
 
-    // 0.5초마다 "..." 애니메이션 효과
+    // 0.4초마다 "..." 애니메이션 효과
     const interval = setInterval(() => {
       setLoadingDots((prev) => (prev.length === 3 ? "." : prev + "."));
     }, 400);
@@ -35,15 +36,35 @@ const LoadingScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.loadingText}>
-        지금 바텐더가 당신을 위한 칵테일을 만들고 있어요{loadingDots}
+        (닉네임)님만을 위한{"\n"}칵테일을 만들고 있어요{loadingDots}
       </Text>
+      <Image
+        source={require("../assets/drawable/cocktail_draw.png")}
+        style={styles.image}
+        resizeMode="contain"
+      />
     </View>
   );
 };
 
-export default LoadingScreen;
-
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", alignItems: "center" },
-  loadingText: { fontSize: 18, fontWeight: "bold" },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#FAF9F6",
+  },
+  loadingText: {
+    fontSize: fontPercentage(18),
+    fontWeight: "bold",
+    color: "#2D2D2D",
+    marginBottom: heightPercentage(20),
+    textAlign: "center",
+  },
+  image: {
+    width: widthPercentage(260),
+    height: heightPercentage(260),
+  },
 });
+
+export default LoadingScreen;

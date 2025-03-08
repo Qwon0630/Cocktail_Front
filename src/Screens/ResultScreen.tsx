@@ -1,8 +1,10 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../navigation/types"; // Stack 타입 정의
+import { RootStackParamList } from "../navigation/types";
+import { widthPercentage, heightPercentage, fontPercentage } from "../assets/styles/FigmaScreen";
+import Icon from "react-native-vector-icons/Ionicons";
 
 type NavigationProps = StackNavigationProp<RootStackParamList, "ResultScreen">;
 
@@ -11,27 +13,32 @@ const ResultScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.resultText}>[닉네임]님을 위한 칵테일이 준비되었습니다!</Text>
-      <View style={styles.cocktailImage} />
-      <Text style={styles.cocktailName}>칵테일 이름</Text>
-      <Text style={styles.cocktailDescription}>칵테일 설명이고 맛있습니다</Text>
-
-      {/* 버튼 및 추가 텍스트 */}
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>해당 메뉴가 있는 가게 찾기</Text>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Image source={require("../assets/drawable/left-chevron.png")} style={styles.icon}/>
       </TouchableOpacity>
+
+      <Text style={styles.resultText}>(닉네임)님,{'\n'}당신을 위한 칵테일이 준비되었어요.</Text>
+
+      <Image source={require("../assets/drawable/cocktail_sample.png")} style={styles.cocktailImage} />
+
+      <Text style={styles.cocktailName}>칵테일 명</Text>
+      <Text style={styles.cocktailDescription}>음료 설명</Text>
+
+      <TouchableOpacity style={styles.mainButton}>
+        <Text style={styles.mainButtonText}>해당 메뉴가 있는 가게 찾기</Text>
+      </TouchableOpacity>
+
       <View style={styles.buttonContainer}>
-        <TouchableOpacity 
-            style={styles.smallButton}
-            onPress={() => navigation.navigate("RecommendationFlow")}
-            >
-          <Text style={styles.buttonText}>다시 찾기</Text>
-        </TouchableOpacity>
         <TouchableOpacity
           style={styles.smallButton}
-          onPress={() => navigation.navigate("Maps")} // '홈으로' 클릭 시 Maps.tsx로 이동
+          onPress={() => navigation.navigate("RecommendationFlow")}
         >
-          <Text style={styles.buttonText}>홈으로</Text>
+          <Text style={styles.smallButtonText}>다시 찾기</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.smallButton} onPress={() => navigation.navigate("Maps")}
+        >
+          <Text style={styles.smallButtonText}>홈으로</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -45,52 +52,79 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#FAF9F6",
+  },
+  icon: {
+    width: widthPercentage(28),
+    height: widthPercentage(28),
+  },
+  backButton: {
+    position: "absolute",
+    top: heightPercentage(50),
+    left: widthPercentage(15),
+  },
+  backButtonText: {
+    fontSize: fontPercentage(24),
+    color: "#000",
   },
   resultText: {
-    fontSize: 20,
-    fontWeight: "bold",
+    fontSize: fontPercentage(16),
+    fontWeight: "500",
+    marginTop: heightPercentage(20),
     textAlign: "center",
-    marginBottom: 15,
+    letterSpacing: -0.02,
+    lineHeight: fontPercentage(26),
   },
   cocktailImage: {
-    width: 100,
-    height: 100,
-    backgroundColor: "#ccc",
-    marginVertical: 10,
+    width: widthPercentage(240),
+    height: heightPercentage(260),
+    borderRadius: 15,
+    marginTop: heightPercentage(20),
   },
   cocktailName: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginTop: 10,
+    height: heightPercentage(48),
+    fontSize: fontPercentage(16),
+    fontWeight: "500",
+    marginTop: heightPercentage(48),
+    color: "#2D2D2D",
   },
   cocktailDescription: {
-    fontSize: 16,
-    textAlign: "center",
-    paddingHorizontal: 20,
-    marginBottom: 20,
-    marginTop: 10,
+    height: heightPercentage(48),
+    fontSize: fontPercentage(14),
+    color: "#7D7A6F",
+    marginTop: heightPercentage(10),
   },
-  button: {
-    backgroundColor: "#ddd",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    marginVertical: 5,
+  mainButton: {
+    width: widthPercentage(343),
+    height: heightPercentage(48),
+    backgroundColor: "#21103C",
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: heightPercentage(20),
   },
-  buttonText: {
-    fontSize: 16,
+  mainButtonText: {
+    fontSize: fontPercentage(16),
+    color: "#FFFFFF",
     fontWeight: "bold",
   },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 10,
+    width: widthPercentage(343),
+    marginTop: heightPercentage(10),
   },
   smallButton: {
-    backgroundColor: "#ddd",
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 10,
-    marginHorizontal: 5,
+    width: widthPercentage(165),
+    height: heightPercentage(48),
+    borderColor: "#D9D9D9",
+    borderWidth: 1,
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  smallButtonText: {
+    fontSize: fontPercentage(16),
+    color: "#2D2D2D",
   },
 });

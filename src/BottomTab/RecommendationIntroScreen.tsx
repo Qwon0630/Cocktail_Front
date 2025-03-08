@@ -1,8 +1,19 @@
-import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import React, { useEffect, useRef } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Animated,
+  StyleSheet,
+  Image,
+} from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/types";
-import Icon from "react-native-vector-icons/Ionicons";
+import {
+  widthPercentage,
+  heightPercentage,
+  fontPercentage,
+} from "../assets/styles/FigmaScreen";
 
 type RecommendationIntroScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -14,21 +25,42 @@ interface Props {
 }
 
 const RecommendationIntroScreen: React.FC<Props> = ({ navigation }) => {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
   return (
     <View style={styles.container}>
       {/* 뒤로가기 버튼 */}
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Icon name="arrow-back" size={28} color="#000" />
+      <TouchableOpacity
+        onPress={() => navigation.goBack()}
+        style={styles.backButton}
+      >
+        <Image
+          source={require("../assets/drawable/left-chevron.png")}
+          style={styles.icon}
+        />
       </TouchableOpacity>
 
-      {/* 설명 텍스트 */}
-      <Text style={styles.description}>
-        오늘, 당신의 기분과 취향을 알려주세요. {"\n"}
-        완벽한 한 잔을 준비할게요.
-      </Text>
+      {/* 설명 텍스트 (페이드인 애니메이션) */}
+      <Animated.View style={{ opacity: fadeAnim }}>
+        <Text style={styles.description}>
+          오늘, 당신의 기분과 취향을 알려주세요.{"\n"}
+          완벽한 한 잔을 준비할게요.
+        </Text>
+      </Animated.View>
 
-      {/* 선택지 (이미지로 표현 가능) */}
-      <View style={styles.imagePlaceholder} />
+      {/* 칵테일 이미지 */}
+      <Image
+        source={require("../assets/drawable/cocktail_draw.png")}
+        style={styles.cocktailImage}
+      />
 
       {/* 버튼 */}
       <TouchableOpacity
@@ -48,34 +80,48 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 20,
+    backgroundColor: "#FAF9F6",
   },
   backButton: {
     position: "absolute",
-    top: 50,
-    left: 20,
+    top: heightPercentage(50),
+    left: widthPercentage(15),
+  },
+  icon: {
+    width: widthPercentage(28),
+    height: widthPercentage(28),
+    marginTop: heightPercentage(54)
   },
   description: {
-    fontSize: 18,
+    width: widthPercentage(375),
+    fontSize: fontPercentage(18),
+    lineHeight: fontPercentage(26),
+    fontWeight: "500",
     textAlign: "center",
-    marginBottom: 20,
+    paddingVertical: heightPercentage(12),
+    paddingHorizontal: widthPercentage(16),
+    marginTop: heightPercentage(150),
   },
-  imagePlaceholder: {
-    width: 150,
-    height: 150,
-    backgroundColor: "#ddd",
-    borderRadius: 10,
-    marginBottom: 20,
+  cocktailImage: {
+    width: widthPercentage(260),
+    height: heightPercentage(260),
+    borderRadius: 8,
+    marginVertical: heightPercentage(20),
   },
   confirmButton: {
-    backgroundColor: "#888",
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    borderRadius: 10,
+    width: widthPercentage(344),
+    height: heightPercentage(48),
+    backgroundColor: "#21103C",
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: heightPercentage(20),
+    paddingVertical: heightPercentage(4),
+    paddingHorizontal: widthPercentage(16),
   },
   confirmButtonText: {
-    fontSize: 16,
-    color: "#fff",
+    fontSize: fontPercentage(16),
+    color: "#FFFFFF",
     fontWeight: "bold",
   },
 });
