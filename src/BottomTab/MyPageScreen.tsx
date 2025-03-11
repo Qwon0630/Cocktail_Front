@@ -1,29 +1,48 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import { widthPercentage, heightPercentage, fontPercentage } from '../assets/styles/FigmaScreen';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { RootStackParamList } from '../Navigation/Navigation';
 
 const MyPageScreen = () => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
+  const [token, setToken] = useState<string | null>('sampleToken');
+
+  //임시 닉네임
+  const nickname = '사용자';
   return (
     <View style={styles.container}>
       {/* 광고 배너 */}
       <Image source={require('../assets/drawable/ad_sample.png')} style={styles.adBanner} />
       
-      {/* 로그인 필요 알림 */}
-      <View style={styles.loginContainer}>
-        <Text style={styles.loginText}>로그인이 필요합니다</Text>
+      {/* 로그인 필요 알림 또는 닉네임 표시 */}
+      <TouchableOpacity
+        style={styles.loginContainer}
+        onPress={() => {
+          if (token) {
+            navigation.navigate('Profile'); // 프로필 화면으로 이동 (예시)
+          } else {
+            navigation.navigate('Login'); // 로그인 화면으로 이동
+          }
+        }}
+      >
+        <Text style={styles.loginText}>
+          {token ? `${nickname}` : '로그인이 필요합니다'}
+        </Text>
         <Image source={require('../assets/drawable/right-chevron.png')} style={styles.rightArrow} />
-      </View>
+      </TouchableOpacity>
 
       {/* 고객지원 섹션 */}
       <Text style={styles.supportTitle}>고객지원</Text>
       <View style={styles.supportSection}>
-        {renderSupportItem('question_mark.png', '1:1 문의하기')}
+        {renderSupportItem('question_mark.png', '1:1 문의하기', () => navigation.navigate('OneOnOne'))}
         <View style={styles.divider} />
-        {renderSupportItem('smile_face.png', '서비스 리뷰 남기기')}
+        {renderSupportItem('smile_face.png', '서비스 리뷰 남기기', () => navigation.navigate('ServiceReview'))}
         <View style={styles.divider} />
-        {renderSupportItem('book_closed.png', '이용약관')}
+        {renderSupportItem('book_closed.png', '이용약관', () => navigation.navigate('TermsOfUse'))}
         <View style={styles.divider} />
-        {renderSupportItem('lock.png', '개인정보처리방침')}
+        {renderSupportItem('lock.png', '개인정보처리방침', () => navigation.navigate('PrivacyPolicy'))}
       </View>
     </View>
   );
@@ -36,13 +55,14 @@ const iconMap: { [key: string]: any } = {
   'right-chevron.png': require('../assets/drawable/right-chevron.png'),
 };
 
-const renderSupportItem = (icon: string, text: string) => {
+// onPress 이벤트를 제대로 전달하도록 수정
+const renderSupportItem = (icon: string, text: string, onPress: () => void) => {
   return (
-    <View style={styles.supportItem}>
+    <TouchableOpacity style={styles.supportItem} onPress={onPress}>
       <Image source={iconMap[icon]} style={styles.supportIcon} />
       <Text style={styles.supportText}>{text}</Text>
       <Image source={iconMap['right-chevron.png']} style={styles.rightArrow} />
-    </View>
+    </TouchableOpacity>
   );
 };
 

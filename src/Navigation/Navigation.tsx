@@ -13,6 +13,11 @@ import ResultScreen from "../Screens/ResultScreen";
 
 import RegionSelectScreen from "../Screens/RegionSelectScreen";
 import CreateNewListScreen from "../Screens/CreateNewListScreen";
+import OneOnOneScreen from "../Screens/OneOnOne";
+import ServiceReviewScreen from "../Screens/ServiceReview";
+import TermsOfUseScreen from "../Screens/TermsOfUse";
+import PrivacyPolicyScreen from "../Screens/PrivacyPolicy";
+
 export type RootStackParamList = {
   Onboarding: undefined;
   Login: undefined;
@@ -24,6 +29,10 @@ export type RootStackParamList = {
   LoadingScreen: undefined;
   ResultScreen: undefined;
   CreateNewListScreen : undefined;
+  OneOnOne: undefined;
+  ServiceReview : undefined;
+  TermsOfUse : undefined;
+  PrivacyPolicy : undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -45,6 +54,10 @@ const Navigation: React.FC = () => {
         <Stack.Screen name="LoadingScreen" component={LoadingScreen} />
         <Stack.Screen name="ResultScreen" component={ResultScreen} />
         <Stack.Screen name="CreateNewListScreen" component={CreateNewListScreen} />
+        <Stack.Screen name="OneOnOne" component={OneOnOneScreen} />
+        <Stack.Screen name="ServiceReview" component={ServiceReviewScreen} />
+        <Stack.Screen name="TermsOfUse" component={TermsOfUseScreen} />
+        <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

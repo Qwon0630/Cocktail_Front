@@ -6,11 +6,13 @@ import {
   Modal,
   TouchableOpacity,
   StyleSheet,
-  Dimensions,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
-
-const { width } = Dimensions.get("window");
+import {
+  widthPercentage,
+  heightPercentage,
+  fontPercentage,
+} from "../assets/styles/FigmaScreen";
 
 interface CocktailDetailModalProps {
   visible: boolean;
@@ -38,7 +40,7 @@ const CocktailDetailModal: React.FC<CocktailDetailModalProps> = ({
         <View style={styles.modalContainer}>
           {/* 닫기 버튼 */}
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Icon name="close" size={30} color="#000" />
+            <Icon name="close" size={fontPercentage(30)} color="#000" />
           </TouchableOpacity>
 
           {/* 칵테일 이미지 */}
@@ -65,52 +67,52 @@ const CocktailDetailModal: React.FC<CocktailDetailModalProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
     justifyContent: "center",
     alignItems: "center",
   },
   modalContainer: {
-    width: width * 0.8,
+    width: widthPercentage(300),
     backgroundColor: "#FAF9F6",
     borderRadius: 15,
-    padding: 20,
+    padding: widthPercentage(20),
     alignItems: "center",
   },
   closeButton: {
     position: "absolute",
-    top: 10,
-    right: 10,
+    top: heightPercentage(10),
+    right: widthPercentage(10),
     zIndex: 10,
   },
   cocktailImage: {
-    width: width * 0.6,
-    height: width * 0.6,
+    width: widthPercentage(240),
+    height: widthPercentage(240),
     borderRadius: 10,
-    marginBottom: 20,
+    marginBottom: heightPercentage(20),
     resizeMode: "cover",
   },
   cocktailName: {
-    fontSize: 22,
+    fontSize: fontPercentage(22),
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: heightPercentage(10),
   },
   cocktailDescription: {
-    fontSize: 16,
+    fontSize: fontPercentage(16),
     color: "#666",
     textAlign: "center",
-    marginBottom: 20,
+    marginBottom: heightPercentage(20),
   },
   infoContainer: {
     width: "100%",
   },
   infoTitle: {
-    fontSize: 18,
+    fontSize: fontPercentage(18),
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: heightPercentage(10),
   },
   infoText: {
-    fontSize: 14,
-    marginBottom: 5,
+    fontSize: fontPercentage(14),
+    marginBottom: heightPercentage(5),
   },
 });
 

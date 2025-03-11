@@ -1,4 +1,3 @@
-// CocktailBookScreen.tsx
 
 import React, { useState } from "react";
 import { 
@@ -8,13 +7,11 @@ import {
   StyleSheet, 
   FlatList, 
   ScrollView, 
-  Dimensions, 
   SafeAreaView, 
   TouchableOpacity 
 } from "react-native";
 import CocktailDetailModal from "../Components/CocktailDetailModal";
-
-const { width } = Dimensions.get("window");
+import { widthPercentage, heightPercentage, fontPercentage } from "../assets/styles/FigmaScreen";
 
 const categories = [
   { title: "우아한 클래식", description: "격식을 갖춘 품격있는 칵테일" },
@@ -144,72 +141,72 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 15,
-    paddingVertical: 10,
+    paddingHorizontal: widthPercentage(15),
+    paddingVertical: heightPercentage(10),
   },
   logo: {
-    width: width * 0.3, 
-    height: width * 0.1,
+    width: widthPercentage(110),
+    height: heightPercentage(40),
     resizeMode: "contain",
   },
   icon: {
-    width: 30,
-    height: 30,
+    width: widthPercentage(30),
+    height: heightPercentage(30),
   },
   recommendationSection: {
     width: "100%",
     alignItems: "center",
-    paddingBottom: 20,
+    paddingBottom: heightPercentage(20),
   },
   recommendationImage: {
-    width: width * 0.9,
-    height: width * 0.5,
+    width: widthPercentage(340),
+    height: heightPercentage(200),
     borderRadius: 10,
-    marginVertical: 15,
+    marginVertical: heightPercentage(15),
   },
   recommendationText: {
-    fontSize: 18,
+    fontSize: fontPercentage(18),
     fontWeight: "bold",
     textAlign: "center",
     color: "#333",
   },
   categorySection: {
-    paddingHorizontal: 15,
-    marginBottom: 20,
+    paddingHorizontal: widthPercentage(15),
+    marginBottom: heightPercentage(20),
   },
   categoryHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: heightPercentage(10),
   },
   categoryIcon: {
-    width: 30,
-    height: 30,
-    marginRight: 10,
+    width: widthPercentage(30),
+    height: heightPercentage(30),
+    marginRight: widthPercentage(10),
   },
   categoryTitle: {
-    fontSize: 16,
+    fontSize: fontPercentage(16),
     fontWeight: "bold",
     color: "#444",
   },
   categoryDescription: {
-    fontSize: 14,
+    fontSize: fontPercentage(14),
     color: "#666",
   },
   cocktailCard: {
-    width: width * 0.3,
+    width: widthPercentage(110),
     alignItems: "center",
-    marginRight: 15,
+    marginRight: widthPercentage(15),
   },
   cocktailImage: {
     width: "100%",
-    height: width * 0.35,
+    height: heightPercentage(120),
     borderRadius: 10,
   },
   cocktailName: {
-    fontSize: 14,
+    fontSize: fontPercentage(14),
     fontWeight: "bold",
     color: "#333",
-    marginTop: 5,
+    marginTop: heightPercentage(5),
   },
 });
