@@ -46,6 +46,7 @@ PODS:
     - KakaoSDKCommon/Common (= 2.22.0)
   - KakaoSDKUser (2.22.0):
     - KakaoSDKAuth (= 2.22.0)
+  - naveridlogin-sdk-ios (4.2.3)
   - RCT-Folly (2024.11.18.00):
     - boost
     - DoubleConversion
@@ -1704,6 +1705,28 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - RNNaverLogin (4.0.4):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - naveridlogin-sdk-ios (= 4.2.3)
+    - RCT-Folly (= 2024.11.18.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - RNReanimated (3.17.1):
     - DoubleConversion
     - glog
@@ -1971,6 +1994,7 @@ DEPENDENCIES:
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - "RNGoogleSignin (from `../node_modules/@react-native-google-signin/google-signin`)"
+  - "RNNaverLogin (from `../node_modules/@react-native-seoul/naver-login`)"
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
@@ -1988,6 +2012,7 @@ SPEC REPOS:
     - KakaoSDKAuth
     - KakaoSDKCommon
     - KakaoSDKUser
+    - naveridlogin-sdk-ios
     - SocketRocket
 
 EXTERNAL SOURCES:
@@ -2140,6 +2165,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-gesture-handler"
   RNGoogleSignin:
     :path: "../node_modules/@react-native-google-signin/google-signin"
+  RNNaverLogin:
+    :path: "../node_modules/@react-native-seoul/naver-login"
   RNReanimated:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
@@ -2168,6 +2195,7 @@ SPEC CHECKSUMS:
   KakaoSDKAuth: 569b377eda622d93d4575240b8031cd658163eef
   KakaoSDKCommon: d57127c339fc79e73aa8b236a4c77211c29924f1
   KakaoSDKUser: 043bcd7e91454ebf3bf64f150c430e6f65f0a08d
+  naveridlogin-sdk-ios: d9d46d02119d303023d7000cd5963864d5bb89e5
   RCT-Folly: 36fe2295e44b10d831836cc0d1daec5f8abcf809
   RCTDeprecation: b2eecf2d60216df56bc5e6be5f063826d3c1ee35
   RCTRequired: 78522de7dc73b81f3ed7890d145fa341f5bb32ea
@@ -2234,6 +2262,7 @@ SPEC CHECKSUMS:
   RNCAsyncStorage: dac011cac81189c2b3b8654f3db97d2b6362d165
   RNGestureHandler: 0a16f3f13829c01268ae55610a40b57b713c8161
   RNGoogleSignin: e548e9a67bb94980df514f71e107a13d6ebe40d3
+  RNNaverLogin: 79e95db74d0a418a39649243a254c7f784d8551f
   RNReanimated: c9f295fb1679867288d238bfaf3ea39225c95e1b
   RNScreens: 77f93ec55b749c49549b447527ebf78e990125f3
   RNVectorIcons: f3e9354fca73876447d183d4b18955e52cd3695c

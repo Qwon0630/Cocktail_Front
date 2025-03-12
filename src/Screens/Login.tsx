@@ -1,11 +1,11 @@
 import React, {useEffect,useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { StackScreenProps } from "@react-navigation/stack";
-// import NaverLogin from "@react-native-seoul/naver-login";
-// import type {
-//   GetProfileResponse,
-//   NaverLoginResponse,
-// } from "@react-native-seoul/naver-login";
+import NaverLogin from "@react-native-seoul/naver-login";
+import type {
+  GetProfileResponse,
+  NaverLoginResponse,
+} from "@react-native-seoul/naver-login";
 import  * as KakaoLogin from "@react-native-seoul/kakao-login";
  
   const consumerKey = 'pjSp0u95mvc6Ufq_TQbP';
@@ -23,36 +23,34 @@ type LoginScreenProps = StackScreenProps<RootStackParamList, "Login">;
 
 const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
 
-  // useEffect(() => {
-  //   NaverLogin.initialize({
-  //     appName,
-  //     consumerKey,
-  //     consumerSecret,
-  //     serviceUrlSchemeIOS: serviceUrlScheme,
-  //     disableNaverAppAuthIOS: true,
-  //   });
-  // }, []);
+  useEffect(() => {
+    NaverLogin.initialize({
+      appName,
+      consumerKey,
+      consumerSecret,
+      serviceUrlSchemeIOS: serviceUrlScheme,
+      disableNaverAppAuthIOS: true,
+    });
+  }, []);
 
-  // const [success, setSuccessResponse] =
-  //   useState<NaverLoginResponse['successResponse']>();
+  const [success, setSuccessResponse] = useState<NaverLoginResponse['successResponse']>();
 
-  // const [failure, setFailureResponse] =
-  //   useState<NaverLoginResponse['failureResponse']>();
-  // const [getProfileRes, setGetProfileRes] = useState<GetProfileResponse>();
+  const [failure, setFailureResponse] = useState<NaverLoginResponse['failureResponse']>();
+  const [getProfileRes, setGetProfileRes] = useState<GetProfileResponse>();
 
-  // const naverLogin = async (): Promise<void> => {
-  //   const { failureResponse, successResponse } = await NaverLogin.login();
-  //   setSuccessResponse(successResponse);
-  //   setFailureResponse(failureResponse);
-  // };
+  const naverLogin = async (): Promise<void> => {
+    const { failureResponse, successResponse } = await NaverLogin.login();
+    setSuccessResponse(successResponse);
+    setFailureResponse(failureResponse);
+  };
 
 
   return (
     
     <View style={styles.container}>
-      {/* <TouchableOpacity onPress={() => naverLogin()} style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <Image source={require('../assets/naver_icon.png')} />
-        </TouchableOpacity> */}
+      <TouchableOpacity onPress={() => naverLogin()} style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <Image source={require('../assets/drawable/naver_icon.png')} />
+        </TouchableOpacity>
     <TouchableOpacity onPress={() => kakaologin()} style={{ flexDirection: 'row', alignItems: 'center' }}>
     <Image source={require('../assets/drawable/kakao_icon.png')}  />
     
