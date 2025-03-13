@@ -5621,7 +5621,8 @@ montage@>=16.0.4:
 
 "mr@git://github.com/montagejs/mr.git#master":
   version "18.0.0"
-  resolved "git+ssh://git@github.com/montagejs/mr.git#22195dd96af0ed498cad363c962c1c1ae2d8cafb"
+  resolved "git+ssh://git@github.com/montagejs/mr.git"
+  integrity sha512-hsvfYz6cBJP3L5z7axT0JtTeN//UKFv8I5uKCrNH0C32mRk2BeJz7QQth87WE08b4Y7u2LWpV7MMC6Po61lIHQ==
   dependencies:
     bluebird "~3.5.5"
 

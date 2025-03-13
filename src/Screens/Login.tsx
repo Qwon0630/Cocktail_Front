@@ -39,10 +39,25 @@ const LoginScreen: React.FC<LoginScreenProps> = ({navigation}) => {
   const [getProfileRes, setGetProfileRes] = useState<GetProfileResponse>();
 
   const naverLogin = async (): Promise<void> => {
-    const { failureResponse, successResponse } = await NaverLogin.login();
-    setSuccessResponse(successResponse);
-    setFailureResponse(failureResponse);
+    try {
+      const response = await NaverLogin.login();
+  
+      if (response.isSuccess && response.successResponse) { 
+        setSuccessResponse(response.successResponse);
+        setFailureResponse(undefined);
+      } else if (response.failureResponse) {
+        setFailureResponse(response.failureResponse);
+      } else {
+        setFailureResponse({ message: '로그인 정보가 없습니다.' });
+      }
+    } catch (error) {
+      console.error('네이버 로그인 실패:', error);
+      setFailureResponse({ message: error?.message || '알 수 없는 오류 발생' });
+    }
   };
+  
+  
+  
 
 
   return (
