@@ -29,8 +29,6 @@ const myList = [
   },
 ];
 
-type NavigationProps = StackNavigationProp<RootStackParamList, "RegionSelectScreen">;
-
 const MyListSheetContent : React.FC =  () => {
   const navigation = useNavigation();
   const handleEdit = (itemId) => {

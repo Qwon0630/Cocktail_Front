@@ -19,7 +19,7 @@ type MapsProps = StackScreenProps<RootStackParamList, "Maps">;
 const Maps: React.FC<MapsProps> = ({ navigation, route }) => {
   const [isSearchCompleted, setIsSearchCompleted] = useState(false);
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
-
+  const [currentView, setCurrentView] = useState("list");
   useEffect(() => {
     if (route.params?.searchCompleted) {
       setIsSearchCompleted(true);
@@ -74,6 +74,7 @@ const Maps: React.FC<MapsProps> = ({ navigation, route }) => {
             latitudeDelta: 0.02,
             longitudeDelta: 0.02,
           }}
+          setCurrentView={setCurrentView}
         />
       </View>
       <View style={styles.searchContainer}>
@@ -91,8 +92,15 @@ const Maps: React.FC<MapsProps> = ({ navigation, route }) => {
     </View>
   )}
 </View>
-      {selectedRegions.length > 0 ? <SelectedRegions selectedRegions={selectedRegions} /> : <BaseBottomSheet />}
+<View style={styles.bottomSheetContainer}>
+      {selectedRegions.length > 0 ? (
+        <SelectedRegions selectedRegions={selectedRegions} />
+      ) : (
+        <BaseBottomSheet currentView={currentView} setCurrentView={setCurrentView} />
+      )}
     </View>
+      </View>
+    
   );
 };
 
@@ -108,6 +116,14 @@ const styles = StyleSheet.create({
     left: widthPercentage(16),
     right: widthPercentage(16),
     zIndex: 10, 
+  },
+  bottomSheetContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: "100%", // ✅ 바텀시트가 보이도록 높이 조정
+    zIndex: 99, // ✅ 검색창보다 낮지만, 다른 UI 요소보다 앞에 배치
   },
   tagsContainer: {
     flexDirection: "row", // 태그를 가로 정렬

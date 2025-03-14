@@ -13,7 +13,7 @@ const Tab = createBottomTabNavigator();
 
 const BottomTabNavigator = () => {
   return (
-    <Tab.Navigator initialRouteName="지도"
+    <Tab.Navigator 
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
           let iconSource;

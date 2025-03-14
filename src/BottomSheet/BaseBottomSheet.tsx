@@ -1,11 +1,13 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useRef, useEffect } from "react";
 import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import BottomSheet from "@gorhom/bottom-sheet";
 import theme from "../assets/styles/theme";
 import SearchSheetContent from "../BottomSheet/SearchSheetContent";
 import MyListSheetContent from "../BottomSheet/MyListSheetContent";
+import BarDetailSheetContent from "../BottomSheet/BarDetailSheetContent";
 import { widthPercentage, heightPercentage, fontPercentage } from "../assets/styles/FigmaScreen";
 import { useNavigation } from "@react-navigation/native"; 
+
 
 const myBars = [
   {
@@ -28,10 +30,15 @@ const nearBars = [
 ];
 
 const BaseBottomSheet = () => {
+  
   const navigation = useNavigation();
+  const bottomSheetRef = useRef(null);
   const snapPoints = useMemo(() => ["10%", "30%", "76%"], []);
   const [showMyBars, setShowMyBars] = useState(true);
   const [selectedTab, setSelectedTab] = useState<"search" | "myList" | "region">("search");
+  const [currentView, setCurrentView] = useState("list");
+  const [selectedBar, setSelectedBar] = useState(null);
+
 
   // sections 데이터 변경
   const sections = useMemo(() => {
@@ -42,40 +49,70 @@ const BaseBottomSheet = () => {
     }
     return [
       { title: "나의 칵테일 바", data: myBars },
-      { title: "근처 칵테일 바", data: nearBars }
+      { title: "근처 칵테일 바", data: nearBars },
     ];
   }, [selectedTab]);
 
   // 버튼 클릭 시 같은 버튼이면 기본 화면('search')으로 변경
   const handleTabPress = (tab: "myList" | "region") => {
     setSelectedTab((prev) => (prev === tab ? "search" : tab));
+  
   };
-
+console.log
   return (
-    <BottomSheet index={0} snapPoints={snapPoints} enablePanDownToClose={false} backgroundStyle={{ backgroundColor: theme.background }}>
-      
+    
+    <BottomSheet
+      ref={bottomSheetRef}
+      index={0}
+      snapPoints={snapPoints}
+      enablePanDownToClose={false}
+      backgroundStyle={{ backgroundColor: theme.background }}
+    >
       {/* 네비게이션 버튼 */}
-      <View style={styles.sheetHeader}>
-        <TouchableOpacity
-          style={[styles.listButton, selectedTab === "myList" && styles.activeButton]}
-          onPress={() => handleTabPress("myList")}
-        >
-          <Text style={[styles.listText, selectedTab === "myList" && styles.activeText]}>나의 리스트</Text>
-        </TouchableOpacity>
+      {currentView === "list" && (
+        <View style={styles.sheetHeader}>
+          <TouchableOpacity
+            style={[styles.listButton, selectedTab === "myList" && styles.activeButton]}
+            onPress={() => handleTabPress("myList")}
+          >
+            <Text style={[styles.listText, selectedTab === "myList" && styles.activeText]}>
+              나의 리스트
+            </Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.listButton, selectedTab === "region" && styles.activeButton]}
-          onPress={() => navigation.navigate("RegionSelectScreen")}
-        >
-          <Text style={[styles.listText, selectedTab === "region" && styles.activeText]}>지역</Text>
-        </TouchableOpacity>
-      </View>
-
-      {selectedTab === "myList" ? (
-        <MyListSheetContent />
-      ) : (
-        <SearchSheetContent sections={sections} showMyBars={showMyBars} setShowMyBars={setShowMyBars} />
+          <TouchableOpacity
+            style={[styles.listButton, selectedTab === "region" && styles.activeButton]}
+            onPress={() => navigation.navigate("RegionSelectScreen")}
+          >
+            <Text style={[styles.listText, selectedTab === "region" && styles.activeText]}>
+              지역
+            </Text>
+          </TouchableOpacity>
+        </View>
       )}
+
+{selectedTab === "myList" ? (
+  <MyListSheetContent />
+) : currentView === "list" ? (
+  <SearchSheetContent
+    bottomSheetRef={bottomSheetRef}
+    sections={sections}
+    showMyBars={showMyBars}
+    setShowMyBars={setShowMyBars}
+    setCurrentView={setCurrentView}
+    setSelectedBar={setSelectedBar}
+    selectedTab={selectedTab} 
+    currentView={currentView}  
+  />
+) : selectedBar ? (
+  <BarDetailSheetContent
+    selectedBar={selectedBar}
+    setCurrentView={setCurrentView}
+    bottomSheetRef={bottomSheetRef}
+  />
+) : (
+  <Text style={{ textAlign: "center", padding: 20 }}>🚨 상세 정보를 표시할 바가 없습니다.</Text>
+)}
     </BottomSheet>
   );
 };

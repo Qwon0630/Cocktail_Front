@@ -1,12 +1,8 @@
-import React from "react";
+import React, {useRef} from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { BottomSheetSectionList } from "@gorhom/bottom-sheet";
 import { widthPercentage, heightPercentage, fontPercentage } from "../assets/styles/FigmaScreen";
 import { useNavigation } from "@react-navigation/native";
-import { RootStackParamList } from "../Navigation/Navigation";
-import { StackScreenProps } from "@react-navigation/stack";
-type SearchScreenProps = StackScreenProps<RootStackParamList, "SearchScreen">;
-
 
 type myBarList = {
   listId: number;
@@ -27,12 +23,29 @@ interface SearchSheetListProps {
   setShowMyBars: (value: boolean) => void;
 }
 
-const MainBottomSheet: React.FC<SearchSheetListProps> = ({ sections, showMyBars, setShowMyBars }) => {
+
+const SearchSheetContent: React.FC<SearchSheetListProps> = ({ sections, showMyBars, setShowMyBars, setSelectedBar, setCurrentView,selectedTab,currentView }) => {
+  console.log("🔹 SearchSheetContent 렌더링됨");
+  console.log("🔹 selectedTab:", selectedTab);
+  console.log("🔹 currentView:", currentView);
+  console.log("🔹 sections 데이터:", sections);
+
   const navigation = useNavigation();
+  
+  const bottomSheetRef = useRef(null);
+  const handleBarPress = (bar) => {
+    console.log("🔥 handleBarPress 실행됨! 선택된 Bar:", bar);
+    setSelectedBar(bar);
+    setCurrentView("detail");
+    bottomSheetRef.current?.expand(); // 바텀시트 확장
+  };
   const renderBarItem = ({ item, index, section }: { item: myBarList; index: number; section: any }) => (
+    
     <>
-      <TouchableOpacity  onPress={() => navigation.navigate("MarketDetail"as never)} 
-      style={styles.itemContainer}>
+      <TouchableOpacity  
+      onPress={() => handleBarPress(item)}
+      style={styles.itemContainer} >
+        
         <Image style={styles.itemImage} source={item.image} />
         <View style={styles.textContainer}>
           <Text style={styles.itemTitle}>{item.title}</Text>
@@ -158,4 +171,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MainBottomSheet;
+export default SearchSheetContent;
