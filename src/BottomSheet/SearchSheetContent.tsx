@@ -1,4 +1,4 @@
-import React, {useRef} from "react";
+import React, {useState} from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { BottomSheetSectionList } from "@gorhom/bottom-sheet";
 import { widthPercentage, heightPercentage, fontPercentage } from "../assets/styles/FigmaScreen";
@@ -24,21 +24,29 @@ interface SearchSheetListProps {
 }
 
 
-const SearchSheetContent: React.FC<SearchSheetListProps> = ({ sections, showMyBars, setShowMyBars, setSelectedBar, setCurrentView,selectedTab,currentView }) => {
-  console.log("🔹 SearchSheetContent 렌더링됨");
-  console.log("🔹 selectedTab:", selectedTab);
-  console.log("🔹 currentView:", currentView);
-  console.log("🔹 sections 데이터:", sections);
-
-  const navigation = useNavigation();
-  
-  const bottomSheetRef = useRef(null);
+const SearchSheetContent: React.FC<SearchSheetListProps> = ({ sections, showMyBars, setShowMyBars,bottomSheetRef, setSelectedBar, setCurrentView,selectedTab,currentView }) => {
+  const [isExpanded, setIsExpanded] = useState(true);
+  const toggleShowMyBars = () => {
+    setIsExpanded(!isExpanded);
+  };
   const handleBarPress = (bar) => {
-    console.log("🔥 handleBarPress 실행됨! 선택된 Bar:", bar);
     setSelectedBar(bar);
     setCurrentView("detail");
-    bottomSheetRef.current?.expand(); // 바텀시트 확장
+    bottomSheetRef.current.expand(); 
+  
   };
+  const getFilteredSections = () => {
+    return sections.map((section) => {
+      if (section.title === "나의 칵테일 바") {
+        return {
+          ...section, // 기존 데이터 유지지
+          data: isExpanded ? section.data : section.data.slice(0, 1), // 참이면 데이터 유지, 아니면 슬라이스스
+        };
+      }
+      return section;
+    });
+  };
+
   const renderBarItem = ({ item, index, section }: { item: myBarList; index: number; section: any }) => (
     
     <>
@@ -60,12 +68,12 @@ const SearchSheetContent: React.FC<SearchSheetListProps> = ({ sections, showMyBa
           </View>
         </View>
       </TouchableOpacity>
-
       {section.title === "나의 칵테일 바" && index === section.data.length - 1 && (
-        <TouchableOpacity style={styles.toggleButton} onPress={() => setShowMyBars(!showMyBars)}>
-          <Text style={styles.toggleText}>{showMyBars ? "접기" : "더보기"}</Text>
+        <TouchableOpacity style={styles.toggleButton} onPress={toggleShowMyBars}>
+          <Text style={styles.toggleText}>{isExpanded ? "접기" : "더보기"}</Text>
         </TouchableOpacity>
       )}
+      
     </>
   );
 
@@ -78,18 +86,11 @@ const SearchSheetContent: React.FC<SearchSheetListProps> = ({ sections, showMyBa
 
   return (
     <BottomSheetSectionList
-      sections={sections}
+      sections={getFilteredSections()}
       keyExtractor={(item) => item.listId.toString()}
       renderItem={renderBarItem}
       renderSectionHeader={renderSectionHeader}
       stickySectionHeadersEnabled={false}
-      ListFooterComponent={() =>
-        showMyBars && (
-          <TouchableOpacity style={styles.toggleButton} onPress={() => setShowMyBars(false)}>
-            <Text style={styles.toggleText}>접기</Text>
-          </TouchableOpacity>
-        )
-      }
     />
   );
 };

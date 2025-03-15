@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import { View, Text, TouchableOpacity, Image, ScrollView, StyleSheet } from "react-native";
-import BottomSheet from "@gorhom/bottom-sheet";
+import { View, Text, TouchableOpacity, Image, ScrollView, StyleSheet, FlatList } from "react-native";
+
 import { widthPercentage, heightPercentage, fontPercentage } from "../assets/styles/FigmaScreen";
 
 const categories = ["음식", "칵테일", "와인/샴페인", "맥주/하이볼", "위스키/보드카", "논알콜", "기타"];
@@ -9,14 +9,12 @@ const categories = ["음식", "칵테일", "와인/샴페인", "맥주/하이볼
 const BarDetailSheetContent = ({ selectedBar, setCurrentView, bottomSheetRef }) => {
 
   return (
-    <BottomSheet ref={bottomSheetRef} index={2} snapPoints={["25%", "50%", "100%"]}>
       <ScrollView style={styles.container}>
-        {/* 🔙 뒤로 가기 버튼 */}
+        
         <TouchableOpacity onPress={() => setCurrentView("list")} style={styles.backButton}>
           <Text style={styles.backText}>← 목록으로</Text>
         </TouchableOpacity>
 
-        {/* 바 상세 정보 */}
         <View style={styles.header}>
           <Text style={styles.TitleText}>{selectedBar?.title}</Text>
           
@@ -24,13 +22,13 @@ const BarDetailSheetContent = ({ selectedBar, setCurrentView, bottomSheetRef }) 
         </View>
         <Text style={styles.distanceText}>{selectedBar?.barAdress}</Text>
 
-        {/* 가게 이미지 슬라이드 */}
+     
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContainer}>
           <Image source={require("../assets/drawable/detailimg1.png")} style={[styles.imgSize, { marginRight: widthPercentage(12) }]} />
           <Image source={require("../assets/drawable/detailimg2.png")} style={styles.imgSize} />
         </ScrollView>
 
-        {/* 가게 정보 리스트 */}
+       
         <View style={styles.infoContainer}>
           <View style={styles.infoItem}>
             <Image source={require("../assets/icons/location.png")} style={styles.icon} />
@@ -41,7 +39,7 @@ const BarDetailSheetContent = ({ selectedBar, setCurrentView, bottomSheetRef }) 
           </View>
         </View>
 
-        {/* 메뉴 탭 */}
+     
         <Text style={[styles.TitleText, { paddingTop: heightPercentage(24), paddingLeft: widthPercentage(16) }]}>메뉴</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <View style={styles.tabsContainer}>
@@ -53,7 +51,6 @@ const BarDetailSheetContent = ({ selectedBar, setCurrentView, bottomSheetRef }) 
           </View>
         </ScrollView>
       </ScrollView>
-    </BottomSheet>
   );
 };
 

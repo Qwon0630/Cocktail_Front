@@ -17,6 +17,13 @@ const myBars = [
     image: require("../assets/drawable/barExample.png"),
     hashtageList: ["#칵테일명", "#칵테일명", "#다른주류명", "#안주명"],
   },
+  {
+    listId: 2,
+    title: "Label",
+    barAdress: "거리",
+    image: require("../assets/drawable/barExample.png"),
+    hashtageList: ["#칵테일명", "#칵테일명", "#다른주류명", "#안주명"],
+  },
 ];
 
 const nearBars = [
@@ -33,12 +40,11 @@ const BaseBottomSheet = () => {
   
   const navigation = useNavigation();
   const bottomSheetRef = useRef(null);
-  const snapPoints = useMemo(() => ["10%", "30%", "76%"], []);
+  const snapPoints = useMemo(() => ["10%", "30%", "76%"], []); // 바텀시트 크기 데이터터
   const [showMyBars, setShowMyBars] = useState(true);
   const [selectedTab, setSelectedTab] = useState<"search" | "myList" | "region">("search");
-  const [currentView, setCurrentView] = useState("list");
-  const [selectedBar, setSelectedBar] = useState(null);
-
+  const [currentView, setCurrentView] = useState("list"); // 리스트 및 상세정보 변경 데이터터
+  const [selectedBar, setSelectedBar] = useState(null); //칵테일바 가게 클릭 데이터
 
   // sections 데이터 변경
   const sections = useMemo(() => {
@@ -58,9 +64,8 @@ const BaseBottomSheet = () => {
     setSelectedTab((prev) => (prev === tab ? "search" : tab));
   
   };
-console.log
+
   return (
-    
     <BottomSheet
       ref={bottomSheetRef}
       index={0}
