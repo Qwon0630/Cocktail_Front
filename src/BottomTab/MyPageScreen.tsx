@@ -11,6 +11,7 @@ import SignOutModal from '../Components/SignOutModal';
 
 import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 
+import { AD_UNIT_BANNER_IOS_PROD } from '@env';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -130,7 +131,7 @@ const handleWithdraw = async () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.bannerAd}>
         <BannerAd
-            unitId={TestIds.BANNER} // 실제 배너 ID로 교체 필요
+            unitId={__DEV__ ? TestIds.BANNER : AD_UNIT_BANNER_IOS_PROD}
             size={BannerAdSize.BANNER}
             requestOptions={{
               requestNonPersonalizedAdsOnly: true,

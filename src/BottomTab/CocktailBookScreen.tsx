@@ -20,6 +20,8 @@ const bannerImages = [
   require("../assets/drawable/banner1.png"),
   require("../assets/drawable/banner2.png"),
 ];
+import { AD_UNIT_BANNER_IOS_PROD } from '@env';
+
 const categories = [
   {
     title: "우아한 클래식", 
@@ -192,7 +194,7 @@ const CocktailBookScreen: React.FC = () => {
         {/* 📌 광고 배너 추가 */}
         <View style={styles.adContainer}>
           <BannerAd
-            unitId={TestIds.BANNER}  // 🛑 실제 앱에서는 Google AdMob ID로 변경
+            unitId={__DEV__ ? TestIds.BANNER : AD_UNIT_BANNER_IOS_PROD}  // 🛑 실제 앱에서는 Google AdMob ID로 변경
             size={BannerAdSize.BANNER}
             requestOptions={{
               requestNonPersonalizedAdsOnly: true,
