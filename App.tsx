@@ -7,7 +7,7 @@ import Navigation from "./src/Navigation/Navigation";
 import {Provider as PaperProvider} from "react-native-paper"
 import { useSafeAreaInsets, SafeAreaProvider } from "react-native-safe-area-context";
 import { setGlobalInsets } from "./src/assets/contexts/globalInsets"; 
-// import MobileAds from "react-native-google-mobile-ads";
+import MobileAds from "react-native-google-mobile-ads";
 // import { firebase } from "@react-native-firebase/app";
 
 import { ToastProvider } from "./src/Components/ToastContext";
@@ -33,18 +33,14 @@ function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === "dark";
   const [isFirstLaunch, setIsFirstLaunch] = useState<null | boolean>(null);
 
-  // useEffect(() => {
-    
-  //   if (!firebase.apps.length) {
-  //     console.log("🔥 Firebase 자동 초기화 완료");
-  //   }
+  useEffect(() => {
 
-  //   MobileAds()
-  //     .initialize()
-  //     .then(() => {
-  //       console.log("AdMob 초기화 완료");
-  //     });
-  // }, []);
+    MobileAds()
+      .initialize()
+      .then(() => {
+        console.log("AdMob 초기화 완료");
+      });
+  }, []);
   useEffect(() => {
     const checkOnboarding = async () => {
       try {

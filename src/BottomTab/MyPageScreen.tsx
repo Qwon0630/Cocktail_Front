@@ -9,7 +9,7 @@ import { useToast } from '../Components/ToastContext';
 import instance from '../tokenRequest/axios_interceptor';
 import SignOutModal from '../Components/SignOutModal';
 
-//import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
+import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
@@ -128,7 +128,7 @@ const handleWithdraw = async () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* <View style={styles.bannerAd}>
+      <View style={styles.bannerAd}>
         <BannerAd
             unitId={TestIds.BANNER} // 실제 배너 ID로 교체 필요
             size={BannerAdSize.BANNER}
@@ -142,7 +142,7 @@ const handleWithdraw = async () => {
               console.log('❌ 광고 로드 실패:', error);
             }}
           />
-      </View> */}
+      </View>
       <TouchableOpacity style={styles.loginContainer} onPress={handleLoginPress}>
         <View style={styles.profileInfoContainer}>
         {isLoggedIn && (
@@ -272,7 +272,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingLeft: widthPercentage(24),
     paddingVertical: heightPercentage(12),
-    marginTop: heightPercentage(30),
   },
   loginText: {
     fontSize: fontPercentage(18),
@@ -328,12 +327,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  bannerAd: {
-    width: widthPercentage(343),
-    height: heightPercentage(56),
-    alignItems: 'center',
-    marginTop: heightPercentage(72),
-  },
+bannerAd: {
+  width: '100%',
+  height: heightPercentage(56),
+  justifyContent: 'center',
+  alignItems: 'center', // ⬅️ 중심 정렬
+  marginTop: heightPercentage(30),
+},
   bottomDivider: {
     height: heightPercentage(8),
     backgroundColor: '#F3EFE6',
