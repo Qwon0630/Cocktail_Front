@@ -13,8 +13,14 @@ import { setGlobalInsets } from "./src/assets/contexts/globalInsets";
 import { ToastProvider } from "./src/Components/ToastContext";
 
 import RNBootSplash from "react-native-bootsplash";
+import mobileAds from 'react-native-google-mobile-ads';
 
 function AppContent() {
+  mobileAds()
+  .initialize()
+  .then(adapterStatuses => {
+  });
+  
   const insets = useSafeAreaInsets();
 
   useEffect(() => {

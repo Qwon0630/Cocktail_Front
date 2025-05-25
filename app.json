@@ -1,4 +1,10 @@
 {
   "name": "Cocktail_Front",
-  "displayName": "Cocktail_Front"
+  "displayName": "Cocktail_Front",
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-7377803973490257~1582848824",
+    "ios_app_id": "ca-app-pub-7377803973490257~9028742937"
+  }
+
+
 }

@@ -9,12 +9,14 @@ import { useToast } from '../Components/ToastContext';
 import instance from '../tokenRequest/axios_interceptor';
 import SignOutModal from '../Components/SignOutModal';
 
-//import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
+// import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 const MyPageScreen = () => {
+ 
+
   const navigation = useNavigation<NavigationProp>();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { showToast } = useToast();
@@ -128,21 +130,7 @@ const handleWithdraw = async () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* <View style={styles.bannerAd}>
-        <BannerAd
-            unitId={TestIds.BANNER} // 실제 배너 ID로 교체 필요
-            size={BannerAdSize.BANNER}
-            requestOptions={{
-              requestNonPersonalizedAdsOnly: true,
-            }}
-            onAdLoaded={() => {
-              console.log('✅ 광고 로드됨');
-            }}
-            onAdFailedToLoad={(error) => {
-              console.log('❌ 광고 로드 실패:', error);
-            }}
-          />
-      </View> */}
+      
       <TouchableOpacity style={styles.loginContainer} onPress={handleLoginPress}>
         <View style={styles.profileInfoContainer}>
         {isLoggedIn && (
@@ -158,6 +146,21 @@ const handleWithdraw = async () => {
         </View>
         <Image source={require('../assets/drawable/right-chevron.png')} style={styles.profilerightArrow} />
       </TouchableOpacity>
+      {/* <View style={styles.bannerAd}>
+        <BannerAd
+            unitId={TestIds.BANNER} 
+            size={BannerAdSize.BANNER}
+            requestOptions={{
+              requestNonPersonalizedAdsOnly: true,
+            }}
+            onAdLoaded={() => {
+              console.log('✅ 광고 로드됨');
+            }}
+            onAdFailedToLoad={(error) => {
+              console.log('❌ 광고 로드 실패:', error);
+            }}
+          />
+      </View> */}
 
       <Text style={styles.supportTitle}>고객지원</Text>
       <View style={styles.supportSection}>
@@ -332,7 +335,6 @@ const styles = StyleSheet.create({
     width: widthPercentage(343),
     height: heightPercentage(56),
     alignItems: 'center',
-    marginTop: heightPercentage(72),
   },
   bottomDivider: {
     height: heightPercentage(8),
