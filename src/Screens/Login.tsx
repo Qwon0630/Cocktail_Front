@@ -1,5 +1,5 @@
 import React, {useEffect,useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image, Platform } from "react-native";
 import { StackScreenProps } from "@react-navigation/stack";
 import * as KakaoLogin from "@react-native-seoul/kakao-login";
 import { heightPercentage, widthPercentage, fontPercentage } from "../assets/styles/FigmaScreen";
@@ -16,6 +16,7 @@ import { RootStackParamList } from "../Navigation/Navigation";
 
 import {useToast} from '../Components/ToastContext';
 
+import { appleAuth }from '@invertase/react-native-apple-authentication';
 //env에서 서버 주소 가져옴
 const server = API_BASE_URL;
 
@@ -68,6 +69,69 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [success, setSuccessResponse] = useState<NaverLoginResponse['successResponse']>();
 
   const [failure, setFailureResponse] = useState<NaverLoginResponse['failureResponse']>();
+
+
+  //애플로그인
+  const handleAppleLogin = async () => {
+  if (Platform.OS !== 'ios') {
+    console.log('애플 로그인은 iOS에서만 지원됩니다.');
+    return;
+  }
+
+  try {
+    const appleAuthRequestResponse = await appleAuth.performRequest({
+      requestedOperation: appleAuth.Operation.LOGIN,
+      requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
+    });
+
+    const { identityToken } = appleAuthRequestResponse;
+
+    if (!identityToken) {
+      console.log('❌ identityToken을 받아오지 못했습니다.');
+      return;
+    }
+
+    // 서버에 보낼 payload 구성
+    const payload = {
+      provider: 'apple',
+      accessToken: identityToken,
+      code: null,
+      state: null,
+    };
+
+    const response = await axios.post(`${server}/api/auth/social-login`, payload, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const code = response.data.data.code;
+    if (code) {
+      navigation.navigate('SignupScreen', { code });
+    } else {
+      const backendAccessToken = response.data.data.access_token;
+      const backendRefreshToken = response.data.data.refresh_token;
+
+      if (backendAccessToken) {
+        await AsyncStorage.setItem('accessToken', backendAccessToken);
+        showToast('로그인 되었습니다.');
+
+        setTimeout(() => {
+          navigation.navigate('BottomTabNavigator', {
+            screen: '지도',
+            params: { shouldRefresh: true },
+          });
+        }, 100);
+      }
+
+      if (backendRefreshToken) {
+        await AsyncStorage.setItem('refreshToken', backendRefreshToken);
+      }
+    }
+  } catch (error) {
+    console.error('❌ Apple 로그인 에러:', error);
+  }
+};
 
 
   //네이버 로그인
@@ -350,16 +414,21 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           />
         </TouchableOpacity>
 
-      {/* google로그인 버튼 */}
-        <TouchableOpacity 
-          style={styles.loginButton}
-          onPress={signInWithGoogle}
-          >
-          <Image
-            source={require("../assets/drawable/google_button.png")}
-            style={styles.buttonImage}
-          />
-        </TouchableOpacity>
+      {/* (google로그인 / apple로그인) 버튼 */}
+      <TouchableOpacity
+        style={styles.loginButton}
+        onPress={Platform.OS === 'ios' ? handleAppleLogin : signInWithGoogle}
+      >
+        <Image
+          source={
+            Platform.OS === 'ios'
+              ? require('../assets/drawable/apple_button.png')
+              : require('../assets/drawable/google_button.png')
+          }
+          style={styles.buttonImage}
+        />
+      </TouchableOpacity>
+
       </View>
     </View>
   );
