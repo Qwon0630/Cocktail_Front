@@ -13,7 +13,7 @@ import {
 import { BannerAd, BannerAdSize, TestIds } from "react-native-google-mobile-ads"; 
 import CocktailDetailModal from "../Components/CocktailDetailModal";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { widthPercentage, heightPercentage, fontPercentage} from "../assets/styles/FigmaScreen";
+import { widthPercentage, heightPercentage, fontPercentage, getResponsiveHeight } from "../assets/styles/FigmaScreen";
 import { useNavigation } from '@react-navigation/native'; 
 import instance from "../tokenRequest/axios_interceptor";
 const bannerImages = [
