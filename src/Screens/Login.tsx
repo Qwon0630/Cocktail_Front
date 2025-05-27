@@ -72,9 +72,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
 
   //애플로그인
-  const handleAppleLogin = async () => {
+const handleAppleLogin = async () => {
   if (Platform.OS !== 'ios') {
-    console.log('애플 로그인은 iOS에서만 지원됩니다.');
+    console.log('❌ 애플 로그인은 iOS에서만 지원됩니다.');
     return;
   }
 
@@ -84,20 +84,28 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
     });
 
-    const { identityToken } = appleAuthRequestResponse;
+    const { identityToken, authorizationCode, user } = appleAuthRequestResponse;
 
-    if (!identityToken) {
-      console.log('❌ identityToken을 받아오지 못했습니다.');
+    if (!identityToken || !authorizationCode) {
+      console.log('❌ identityToken 또는 authorizationCode 누락');
+      console.log('identityToken:', identityToken);
+      console.log('authorizationCode:', authorizationCode);
       return;
     }
 
-    // 서버에 보낼 payload 구성
+    console.log('✅ Apple 로그인 성공');
+    console.log('📌 identityToken:', identityToken.slice(0, 50) + '...'); // 너무 길어서 일부만 출력
+    console.log('📌 authorizationCode:', authorizationCode);
+    console.log('📌 user:', user);
+
     const payload = {
-      provider: 'apple',
+      provider: "apple",
+      // code: authorizationCode,
+      // 또는 아래처럼 identityToken 보낼 경우에는 accessToken 사용
       accessToken: identityToken,
-      code: null,
-      state: null,
     };
+
+    console.log('📤 서버 전송 payload:', payload);
 
     const response = await axios.post(`${server}/api/auth/social-login`, payload, {
       headers: {
@@ -105,33 +113,47 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       },
     });
 
+    console.log('✅ 서버 응답:', response.data);
+
     const code = response.data.data.code;
+
     if (code) {
+      console.log('🆕 신규 회원 → 회원가입 화면으로 이동');
       navigation.navigate('SignupScreen', { code });
     } else {
+      console.log('🎉 기존 회원 로그인 성공');
       const backendAccessToken = response.data.data.access_token;
       const backendRefreshToken = response.data.data.refresh_token;
 
       if (backendAccessToken) {
         await AsyncStorage.setItem('accessToken', backendAccessToken);
         showToast('로그인 되었습니다.');
-
-        setTimeout(() => {
-          navigation.navigate('BottomTabNavigator', {
-            screen: '지도',
-            params: { shouldRefresh: true },
-          });
-        }, 100);
       }
-
       if (backendRefreshToken) {
         await AsyncStorage.setItem('refreshToken', backendRefreshToken);
       }
+
+      setTimeout(() => {
+        navigation.navigate("BottomTabNavigator", {
+          screen: "지도",
+          params: { shouldRefresh: true },
+        });
+      }, 100);
     }
   } catch (error) {
-    console.error('❌ Apple 로그인 에러:', error);
+    if (axios.isAxiosError(error)) {
+      console.error('❌ Apple 로그인 - AxiosError 발생');
+      console.error('📛 응답 상태코드:', error.response?.status);
+      console.error('📛 응답 내용:', error.response?.data);
+      console.error('📛 요청 URL:', error.config?.url);
+      console.error('📛 요청 payload:', error.config?.data);
+      console.error('📛 요청 헤더:', error.config?.headers);
+    } else {
+      console.error('❌ Apple 로그인 중 알 수 없는 에러 발생:', error);
+    }
   }
 };
+
 
 
   //네이버 로그인
