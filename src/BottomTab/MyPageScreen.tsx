@@ -164,7 +164,9 @@ const handleWithdraw = async () => {
 
       <Text style={styles.supportTitle}>고객지원</Text>
       <View style={styles.supportSection}>
+        <TouchableOpacity onPress={()=>navigation.navigate("SignupScreen"as never)}>
         {renderSupportItem('question_mark.png', '1:1 문의하기')}
+        </TouchableOpacity>
         <View style={styles.divider} />
         {renderSupportItem('smile_face.png', '서비스 리뷰 남기기')}
         <View style={styles.divider} />

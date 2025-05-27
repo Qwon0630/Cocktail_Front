@@ -4,6 +4,8 @@
 
 # Xcode
 #
+gradle.properties
+.keystore
 .env
 build/
 *.pbxuser

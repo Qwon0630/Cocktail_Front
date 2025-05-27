@@ -1,14 +1,26 @@
-import React from 'react';
-import { Text, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, Button, StyleSheet, Alert, SafeAreaView, TouchableOpacity, Image } from 'react-native';
+import { heightPercentage, widthPercentage } from '../assets/styles/FigmaScreen';
+import { useNavigation } from '@react-navigation/native';
 
 const TermsAndConditionsScreen = () => {
-  
+  const navigation = useNavigation()
+
 
   return (
     <SafeAreaView style={{flex: 1}}>
       <ScrollView style={styles.container}>
+        {/* 이용약관 */}
+        <View style={styles.headerContainer}>
+          <TouchableOpacity style={{flex : 0.48}}
+                onPress={() => navigation.goBack()}>
+                  <Image
+                    source={require("../assets/drawable/left-chevron.png")}
+                    style={styles.backIcon}
+                  />
+                </TouchableOpacity>
         <Text style={styles.title}>이용 약관</Text>
-
+        </View>
         <Text style={styles.sectionTitle}>제1조 (목적)</Text>
         <Text style={styles.sectionContent}>
           이 약관은 "Onz" 애플리케이션(이하 "앱")을 이용하는 이용자와 서비스 제공자 간의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.
@@ -45,10 +57,6 @@ const TermsAndConditionsScreen = () => {
         <Text style={styles.sectionContent}>
           1. 회원가입은 SNS 인증 방식을 통해 이루어집니다.
         </Text>
-        <Text style={styles.sectionContent}>
-          2. 본 앱은 법적 음주 허용 연령(만 19세 이상)인 성인만 이용할 수 있습니다. 미성년자는 이용할 수 없습니다.
-        </Text>
-
         <Text style={styles.sectionTitle}>제6조 (회원의 의무)</Text>
         <Text style={styles.sectionContent}>
           1. 이용자는 관계법령, 본 약관의 규정, 이용안내 및 주의사항 등을 준수해야 합니다.
@@ -93,10 +101,23 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
+  headerContainer : {
+    
+    flexDirection : "row",
+    marginVertical : heightPercentage(50)
+  },
+  backIcon: {
+        width: widthPercentage(23),
+        height: heightPercentage(23),
+        marginTop: heightPercentage(68),
+        resizeMode : "contain"
+      },
   title: {
+    paddingTop : heightPercentage(60),
+    textAlign : "center",
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
+
   },
   sectionTitle: {
     fontSize: 18,
