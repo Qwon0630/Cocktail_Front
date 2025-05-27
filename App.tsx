@@ -20,12 +20,6 @@ function AppContent() {
   .initialize()
   .then(adapterStatuses => {
   });
-  
-  const insets = useSafeAreaInsets();
-
-  useEffect(() => {
-    setGlobalInsets(insets);
-  }, [insets]);
 
   return (
     <ToastProvider>
