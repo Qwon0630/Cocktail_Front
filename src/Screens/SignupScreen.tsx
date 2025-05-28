@@ -42,8 +42,6 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
       nickName : nickname,
       ageTerm : agreements.age,
       serviceTerm : agreements.terms,
-      marketingTerm : agreements.marketing,
-      adTerm :  agreements.ads,
     }
     try{
     const response = await instance.post("/api/auth/signup", payload, {
@@ -97,14 +95,10 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
     all: false,
     age: false,
     terms: false,
-    marketing: false,
-    ads: false,
   });
   const [detailsVisible, setDetailsVisible] = useState({
     age: false,
     terms: false,
-    marketing: false,
-    ads: false,
   });
 
   const handleCheckboxChange = (key: keyof typeof agreements) => {
@@ -114,16 +108,12 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
         all: newState,
         age: newState,
         terms: newState,
-        marketing: newState,
-        ads: newState,
       });
     } else {
       const newAgreements = { ...agreements, [key]: !agreements[key] };
       newAgreements.all =
         newAgreements.age &&
-        newAgreements.terms &&
-        newAgreements.marketing &&
-        newAgreements.ads;
+        newAgreements.terms 
       setAgreements(newAgreements);
     }
   };
@@ -193,10 +183,8 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
 
         {/* 개별 약관 동의 */}
         {[
-          { key: "age", text: "(필수) 만 14세 이상입니다" },
+          { key: "age", text: "(필수) 만 17세 이상입니다" },
           { key: "terms", text: "(필수) 서비스 이용약관" },
-          { key: "marketing", text: "(선택) 마케팅 활용 동의" },
-          { key: "ads", text: "(선택) 광고성 정보 수신 동의" },
         ].map(({ key, text }) => (
           <View key={key}>
             <TouchableOpacity
@@ -212,17 +200,18 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
                 style={styles.checkbox}
               />
               {textBoldChange(text)}
-              <TouchableOpacity onPress={() => toggleDetails(key as keyof typeof detailsVisible)}>
+                {key === "terms" && (
+              <TouchableOpacity onPress={() => navigation.navigate("TermsAndConditionsScreen")}>
                 <Image
                   source={require("../assets/drawable/chevron.png")}
                   style={[
                     styles.arrowIcon,
-                    detailsVisible[key as keyof typeof detailsVisible] && styles.arrowRotated,
+                    detailsVisible.terms && styles.arrowRotated,
                   ]}
                 />
               </TouchableOpacity>
-            </TouchableOpacity>
-
+            )}
+          </TouchableOpacity>
             {/* 약관 상세 내용 */}
             {detailsVisible[key as keyof typeof detailsVisible] && (
               <View style={styles.detailBox}>
@@ -260,13 +249,13 @@ const SignupScreen: React.FC<SignupScreenProps> = ({navigation}) => {
 const styles = StyleSheet.create({
     container: {
       flexGrow: 1,
-      paddingTop: heightPercentage(80), // 🔥 전체적인 위치 조정
+      paddingTop: heightPercentage(80), 
       paddingHorizontal: widthPercentage(16),
       backgroundColor: "#FFFFFF",
     },
     backButton: {
       position: "absolute",
-      top: heightPercentage(15), // 🔥 더 위로 조정
+      top: heightPercentage(15), 
       left: widthPercentage(16),
       zIndex : 10,
     },
