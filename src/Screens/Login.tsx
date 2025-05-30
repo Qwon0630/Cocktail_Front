@@ -32,8 +32,8 @@ const config = {
   },
 };
 
-const consumerKey = "Oc17d0i2lHxKxHhTqL1C";
-const consumerSecret = "PgG9qhIBZP";
+const consumerKey = "ZGxXBBPpRH3V1SuUWME8";
+const consumerSecret = "joOUHCi6DR";
 const appName = "onz";
 const serviceUrlScheme = "naverlogin";
 
