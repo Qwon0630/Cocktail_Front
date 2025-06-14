@@ -1,4 +1,4 @@
-import React, { useState} from "react";
+import React, { useState } from "react";
 import { Image, TouchableOpacity, View, SafeAreaView } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import MapScreen from "../BottomTab/Maps";
@@ -6,173 +6,133 @@ import CocktailBookScreen from "../BottomTab/CocktailBookScreen";
 import RecommendationsScreen from "../BottomTab/RecommendationIntroScreen";
 import MyPageScreen from "../BottomTab/MyPageScreen";
 import theme from "../assets/styles/theme";
-import { widthPercentage, heightPercentage, fontPercentage, getResponsiveHeight } from "../assets/styles/FigmaScreen";
-import LoginBottomSheet from "../BottomSheet/LoginBottomSheetProps"; // 로그인 바텀시트 추가
+import {
+  widthPercentage,
+  heightPercentage,
+  getResponsiveHeight,
+} from "../assets/styles/FigmaScreen";
+import LoginBottomSheet from "../BottomSheet/LoginBottomSheetProps";
 import { useNavigation } from "@react-navigation/native";
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 import { isTokenExpired } from "../tokenRequest/Token";
+
 const Tab = createBottomTabNavigator();
+
+const getTabImage = (screenName: string, focused: boolean) => {
+  switch (screenName) {
+    case "지도":
+      return focused
+        ? require("../assets/drawable/map_tab_active.png")
+        : require("../assets/drawable/map_tab_inactive.png");
+    case "칵테일 백과":
+      return focused
+        ? require("../assets/drawable/book_tab_active.png")
+        : require("../assets/drawable/book_tab_inactive.png");
+    case "맞춤 추천":
+      return require("../assets/drawable/recommend_tab_inactive.png"); // 추천은 단일 이미지
+    case "마이페이지":
+      return focused
+        ? require("../assets/drawable/mypage_tab_active.png")
+        : require("../assets/drawable/mypage_tab_inactive.png");
+    default:
+      return null;
+  }
+};
+
+const CustomTabBarButton = ({ screenName, focused, onPress, onLoginTrigger }) => {
+  const navigation = useNavigation();
+
+  const handlePress = async () => {
+    if (screenName === "맞춤 추천") {
+      const token = await AsyncStorage.getItem("accessToken");
+      const expired = token ? await isTokenExpired() : true;
+      if (!token || expired) {
+        onLoginTrigger();
+        return;
+      }
+    }
+    navigation.navigate("BottomTabNavigator", { screen: screenName });
+  };
+
+  return (
+    <TouchableOpacity
+      style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      activeOpacity={1}
+      onPress={handlePress}
+    >
+      <Image
+        source={getTabImage(screenName, focused)}
+        style={{
+          width: widthPercentage(52),  // Hug 기준 최대값으로 통일
+          height: heightPercentage(41),
+          resizeMode: "contain",
+        }}
+      />
+    </TouchableOpacity>
+  );
+};
 
 const BottomTabNavigator = () => {
   const navigation = useNavigation();
   const [isLoginSheetVisible, setLoginSheetVisible] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-
-  // 맞춤 추천 탭을 눌렀을 때 실행
-  const handleRecommendationPress = async () => {
-    try {
-      const token = await AsyncStorage.getItem('accessToken');
-  
-      if (!token) {
-        setIsLoggedIn(false);
-        setLoginSheetVisible(true); // 로그인 바텀시트 표시
-        return;
-      }
-  
-      const expired = await isTokenExpired();
-  
-      if (expired) {
-        setIsLoggedIn(false);
-        setLoginSheetVisible(true); // 만료된 경우 로그인 바텀시트 표시
-        return;
-      }
-  
-      
-      // 유효한 토큰
-      setIsLoggedIn(true);
-      navigation.navigate("BottomTabNavigator", { screen: "맞춤 추천" });
-  
-    } catch (error) {
-      console.error("🔒 토큰 확인 중 오류 발생:", error);
-      setLoginSheetVisible(true); // 오류 시에도 로그인 바텀시트 표시
-    }
-  };
-  
-
-  // 커스텀 탭 버튼
-  const CustomTabBarButton = (props) => {
-    return (
-      <TouchableOpacity 
-        {...props} 
-        onPress={() => {
-          console.log("🖲 CustomTabBarButton 클릭됨!");
-          handleRecommendationPress();
-        }} 
-        activeOpacity={1} 
+  const renderTabButton = (routeName: string) => {
+    return ({ accessibilityState }) => (
+      <CustomTabBarButton
+        screenName={routeName}
+        focused={accessibilityState.selected}
+        onLoginTrigger={() => setLoginSheetVisible(true)}
       />
     );
   };
 
-
-
   return (
-    <View style={{ flex: 1}}>
+    <View style={{ flex: 1 }}>
       <Tab.Navigator
         initialRouteName="지도"
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ color, size }) => {
-            let iconSource;
-            let iconStyle = {
-              width: widthPercentage(18),
-              height: heightPercentage(18),
-              tintColor: color,
-              marginTop: heightPercentage(4),
-            };
-
-            if (route.name === "지도") {
-              iconSource = require("../assets/drawable/maps.png");
-            } else if (route.name === "칵테일 백과") {
-              iconSource = require("../assets/drawable/dictionary.png");
-            } else if (route.name === "맞춤 추천") {
-              iconSource = require("../assets/drawable/recommend.png");
-            } else if (route.name === "마이페이지") {
-              iconSource = require("../assets/drawable/mypage.png");
-            }
-
-            return <Image source={iconSource} style={iconStyle} resizeMode="contain" />;
-          },
+        screenOptions={{
+          headerShown: false,
           tabBarStyle: {
-            height: getResponsiveHeight(60,60,60,90,80,80),
+            height: getResponsiveHeight(90, 90, 90, 100, 100, 100),
             backgroundColor: theme.background,
           },
-          tabBarLabelStyle: {
-            fontSize: fontPercentage(11),
-            paddingBottom: 5,
-          },
-          tabBarItemStyle: {
-            justifyContent: "center",
-            alignItems: "center",
-            marginBottom: 5,
-          },
-          tabBarActiveTintColor: "black",
-          tabBarInactiveTintColor: theme.bottomTextColor,
-        })}
+        }}
       >
         <Tab.Screen
           name="지도"
           component={MapScreen}
-          options={({ route }) => {
-            const hideTabBar = route?.params?.hideTabBar;
-
-            return {
-              headerShown: false,
-              tabBarStyle: hideTabBar
-                ? { display: "none" }
-                : {
-                    height: getResponsiveHeight(60,60,60,90,80,80),
-                    backgroundColor: theme.background,
-                  },
-            };
-          }}
+          options={{ tabBarButton: renderTabButton("지도") }}
         />
-
-        <Tab.Screen name="칵테일 백과" component={CocktailBookScreen} options={{ headerShown: false }} />
-
-        {/* 맞춤 추천 버튼 - 로그인 여부 확인 후 처리 */}
+        <Tab.Screen
+          name="칵테일 백과"
+          component={CocktailBookScreen}
+          options={{ tabBarButton: renderTabButton("칵테일 백과") }}
+        />
         <Tab.Screen
           name="맞춤 추천"
           component={RecommendationsScreen}
-          options={{
-            headerShown: false,
-            tabBarIcon: ({ color }) => (
-              <Image
-                source={require("../assets/drawable/recommend.png")}
-                style={{
-                  width: widthPercentage(18),
-                  height: heightPercentage(18),
-                  tintColor: color,
-                  marginTop: heightPercentage(4),
-                }}
-                resizeMode="contain"
-              />
-            ),
-            tabBarButton: CustomTabBarButton,
-          }}
+          options={{ tabBarButton: renderTabButton("맞춤 추천") }}
         />
-      
-
-        <Tab.Screen name="마이페이지" component={MyPageScreen} options={{ headerShown: false }} />
+        <Tab.Screen
+          name="마이페이지"
+          component={MyPageScreen}
+          options={{ tabBarButton: renderTabButton("마이페이지") }}
+        />
       </Tab.Navigator>
-      {/* 로그인 바텀시트 */}
-      <LoginBottomSheet
-      isVisible={isLoginSheetVisible}
-      onClose={() => setLoginSheetVisible(false)}
-      onLogin={() => {
-        setIsLoggedIn(true);
-        setLoginSheetVisible(false);
-        navigation.navigate("맞춤 추천" as never);
-      }}
-      navigation={navigation}
-    />
 
-  <SafeAreaView 
-    edges={['bottom']}
-    style={{backgroundColor: theme.background}}
-  />
-    
+      <LoginBottomSheet
+        isVisible={isLoginSheetVisible}
+        onClose={() => setLoginSheetVisible(false)}
+        onLogin={() => {
+          setIsLoggedIn(true);
+          setLoginSheetVisible(false);
+          navigation.navigate("맞춤 추천" as never);
+        }}
+        navigation={navigation}
+      />
+
+      {/* <SafeAreaView edges={["bottom"]} style={{ backgroundColor: theme.background }} /> */}
     </View>
   );
 };
