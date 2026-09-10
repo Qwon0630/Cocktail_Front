@@ -9,6 +9,9 @@
 build/
 *.pbxuser
 
+# Sentry — auth.token 이 들어있다. CI 에서 시크릿으로 생성한다.
+sentry.properties
+
 # Local-only (로컬 E2E 플로우 — 커밋 금지)
 .maestro/
 !default.pbxuser

@@ -4,6 +4,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import crashlytics from '@react-native-firebase/crashlytics';
+import * as Sentry from '@sentry/react-native';
 import { fontPercentage, heightPercentage, widthPercentage } from '../../assets/styles/FigmaScreen';
 import { colors, fonts, fontSize, radius, spacing } from '../../lib/theme';
 
@@ -25,13 +26,16 @@ class ErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
-    // 개발 중엔 콘솔, 배포본에선 Crashlytics 로 남긴다.
+    // 개발 중엔 콘솔, 배포본에선 Crashlytics + Sentry 로 남긴다.
     console.error('[ErrorBoundary]', error, info.componentStack);
     try {
       crashlytics().recordError(error);
     } catch {
       // Crashlytics 미초기화 환경(테스트 등)에서는 무시한다.
     }
+    Sentry.captureException(error, {
+      contexts: { react: { componentStack: info.componentStack } },
+    });
   }
 
   reset = () => this.setState({ error: null });

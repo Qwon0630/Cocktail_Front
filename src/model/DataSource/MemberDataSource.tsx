@@ -4,6 +4,7 @@ import instance from '../../tokenRequest/axios_interceptor';
 import { UserResponse } from '../dto/UserDto';
 import { UserUpdate, UserUpdateResponse } from '../dto/UserUpdateDto.ts';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Sentry from '@sentry/react-native';
 
 
 export class MemberRemoteDataSource {
@@ -27,6 +28,7 @@ export class MemberRemoteDataSource {
       console.log('회원탈퇴: ', JSON.stringify(res.data));
       await AsyncStorage.removeItem('accessToken');
       await AsyncStorage.removeItem('refreshToken');
+      Sentry.setUser(null);
       return {
         code: res.data.code,
         msg: res.data.msg,

@@ -23,6 +23,8 @@ else
   use_frameworks! :linkage => :static # ✅ Dynamic에서 Static으로 변경
 end
 
+use_modular_headers!
+
 target 'Cocktail_Front' do
   config = use_native_modules!
 
