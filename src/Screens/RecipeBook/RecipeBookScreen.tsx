@@ -1,10 +1,14 @@
 // RecipeBookScreen.tsx
 // 탭3 "레시피북" — 레시피(칵테일) 전용. 가이드는 독립 탭으로 분리되어 세그먼트를 제거했다.
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { fontPercentage, heightPercentage, widthPercentage } from '../../assets/styles/FigmaScreen';
+import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useNavigation} from '@react-navigation/native';
+import {
+  fontPercentage,
+  heightPercentage,
+  widthPercentage,
+} from '../../assets/styles/FigmaScreen';
 import AllCocktailScreen from '../AllCocktail/AllCocktailScreen';
 
 const RecipeBookScreen = () => {
@@ -13,7 +17,8 @@ const RecipeBookScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top + heightPercentage(8) }]}>
+      <View
+        style={[styles.header, {paddingTop: insets.top + heightPercentage(8)}]}>
         <View style={styles.titleRow}>
           <Text style={styles.title}>레시피 북</Text>
           <TouchableOpacity
@@ -21,8 +26,7 @@ const RecipeBookScreen = () => {
             style={styles.searchButton}
             accessibilityRole="button"
             accessibilityLabel="칵테일 검색"
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
+            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
             <Image
               source={require('../../assets/drawable/SharpSearch.png')}
               style={styles.searchIcon}
@@ -42,7 +46,7 @@ const RecipeBookScreen = () => {
 export default RecipeBookScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFFFFF' },
+  container: {flex: 1, backgroundColor: '#FFFFFF'},
   header: {
     paddingHorizontal: widthPercentage(20),
     backgroundColor: '#FFFFFF',
@@ -63,8 +67,12 @@ const styles = StyleSheet.create({
     borderRadius: widthPercentage(18),
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFFFFF',
   },
-  searchIcon: { width: widthPercentage(18), height: widthPercentage(18) },
-  content: { flex: 1 },
+  searchIcon: {
+    width: widthPercentage(18),
+    height: widthPercentage(18),
+    tintColor: '#000000',
+  },
+  content: {flex: 1},
 });
