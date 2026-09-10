@@ -1,24 +1,37 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { fontPercentage, heightPercentage } from '../../assets/styles/FigmaScreen';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  FlatList,
+  ActivityIndicator,
+  Animated,
+} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import {
+  fontPercentage,
+  heightPercentage,
+} from '../../assets/styles/FigmaScreen';
 import instance from '../../tokenRequest/axios_interceptor';
-import { unwrap, toUserMessage } from '../../lib/api';
-import type { NewsCard, NewsFeedResponse } from '../../types/api';
+import {unwrap, toUserMessage} from '../../lib/api';
+import type {NewsCard, NewsFeedResponse} from '../../types/api';
 import ErrorState from '../../Components/common/ErrorState';
 import EmptyState from '../../Components/common/EmptyState';
 import SkeletonList from '../../Components/common/SkeletonList';
-import { formatDate } from '../../lib/date';
-import { colors, fonts, radius } from '../../lib/theme';
+import {formatDate} from '../../lib/date';
+import {colors, fonts, radius} from '../../lib/theme';
 
 /** 서버 기본값과 맞춘다(BE: MagazineService.DEFAULT_SIZE). */
 const PAGE_SIZE = 20;
 
 const CATEGORIES = [
-  { id: 'ALL', label: '전체' },
-  { id: 'STORY', label: '스토리' },
-  { id: 'GUIDE', label: '가이드' },
+  {id: 'ALL', label: '전체'},
+  {id: 'STORY', label: '스토리'},
+  {id: 'GUIDE', label: '가이드'},
 ];
 
 const NewsScreen = () => {
@@ -29,7 +42,9 @@ const NewsScreen = () => {
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   // QA: "매거진 해시태그를 검색·필터링에 쓸 수 있으면 좋겠다" → 상단 칩으로 노출한다.
   const [tags, setTags] = useState<string[]>([]);
-  const [selectedTag, setSelectedTag] = useState<string | null>(route.params?.tag ?? null);
+  const [selectedTag, setSelectedTag] = useState<string | null>(
+    route.params?.tag ?? null,
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   // null = 아직 안 불러옴, undefined 로 두지 않는다. 마지막 페이지면 서버가 null 을 준다.
@@ -40,6 +55,32 @@ const NewsScreen = () => {
   // (없으면 '스토리' 탭에 '가이드' 글이 섞이고 커서까지 남의 것으로 덮인다)
   const generation = useRef(0);
   const tagRef = useRef<string | null>(null);
+  // 태그 바를 스크롤량에 그대로 붙여 접는다 — 손가락 움직임과 같이 올라가는 느낌.
+  // diffClamp 로 순방향 스크롤 누적치만 뽑아, 목록 한참 내려간 상태에서도 위로 조금만 올리면 바로 펼쳐진다.
+  const [tagBarHeight, setTagBarHeight] = useState(0);
+  const scrollY = useRef(new Animated.Value(0)).current;
+  // iOS 상단 바운스(오버스크롤)는 y 가 음수로 갔다가 0으로 복귀하며 "증가"로 잡혀
+  // diffClamp 가 이를 아래로 스크롤한 것으로 오인한다. 음수 구간을 0으로 눌러 차단.
+  const clampedScrollY = useMemo(
+    () =>
+      scrollY.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, 1],
+        extrapolateLeft: 'clamp',
+      }),
+    [scrollY],
+  );
+  const diffClampedScrollY = useMemo(
+    () => Animated.diffClamp(clampedScrollY, 0, tagBarHeight || 1),
+    [clampedScrollY, tagBarHeight],
+  );
+  const onScroll = useMemo(
+    () =>
+      Animated.event([{nativeEvent: {contentOffset: {y: scrollY}}}], {
+        useNativeDriver: false,
+      }),
+    [scrollY],
+  );
 
   /**
    * 매거진 목록.
@@ -47,61 +88,89 @@ const NewsScreen = () => {
    * 예전엔 전량을 받아 클라이언트에서 정렬·필터했다. 글이 늘수록 첫 진입이 느려지는 구조라
    * 서버 커서 페이지네이션으로 옮겼다. 정렬(최신순)과 카테고리 필터도 서버가 한다.
    */
-  const fetchPage = useCallback(async (category: string, tag: string | null, cursor: string | null) => {
-    const res = await instance.get('/api/v2/magazine', {
-      params: {
-        category,
-        size: PAGE_SIZE,
-        ...(tag ? { tag } : {}),
-        ...(cursor ? { cursor } : {}),
-      },
-    });
-    return unwrap<NewsFeedResponse>(res);
-  }, []);
+  const fetchPage = useCallback(
+    async (category: string, tag: string | null, cursor: string | null) => {
+      const res = await instance.get('/api/v2/magazine', {
+        params: {
+          category,
+          size: PAGE_SIZE,
+          ...(tag ? {tag} : {}),
+          ...(cursor ? {cursor} : {}),
+        },
+      });
+      return unwrap<NewsFeedResponse>(res);
+    },
+    [],
+  );
 
-  const loadFirstPage = useCallback(async (category: string) => {
-    const gen = ++generation.current;
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await fetchPage(category, tagRef.current, null);
-      if (gen !== generation.current) { return; }
-      setNews(data.items ?? []);
-      setNextCursor(data.nextCursor ?? null);
-    } catch (e) {
-      if (gen !== generation.current) { return; }
-      setError(toUserMessage(e, '매거진을 불러오지 못했습니다.'));
-      setNews([]);
-      setNextCursor(null);
-    } finally {
-      if (gen === generation.current) { setLoading(false); }
-    }
-  }, [fetchPage]);
+  const loadFirstPage = useCallback(
+    async (category: string) => {
+      const gen = ++generation.current;
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await fetchPage(category, tagRef.current, null);
+        if (gen !== generation.current) {
+          return;
+        }
+        setNews(data.items ?? []);
+        setNextCursor(data.nextCursor ?? null);
+      } catch (e) {
+        if (gen !== generation.current) {
+          return;
+        }
+        setError(toUserMessage(e, '매거진을 불러오지 못했습니다.'));
+        setNews([]);
+        setNextCursor(null);
+      } finally {
+        if (gen === generation.current) {
+          setLoading(false);
+        }
+      }
+    },
+    [fetchPage],
+  );
 
   const loadMore = useCallback(async () => {
     // nextCursor 가 null 이면 마지막 페이지다. loadingMore 가드가 없으면
     // onEndReached 가 스크롤 한 번에 여러 번 불려 같은 페이지를 중복으로 붙인다.
-    if (!nextCursor || loadingMore || loading) { return; }
+    if (!nextCursor || loadingMore || loading) {
+      return;
+    }
     const gen = generation.current;
     setLoadingMore(true);
     try {
       const data = await fetchPage(selectedCategory, selectedTag, nextCursor);
       // 응답이 오는 사이 카테고리가 바뀌었으면 이 페이지는 남의 것이다.
-      if (gen !== generation.current) { return; }
+      if (gen !== generation.current) {
+        return;
+      }
       setNews(prev => [...prev, ...(data.items ?? [])]);
       setNextCursor(data.nextCursor ?? null);
     } catch {
       // 다음 페이지 실패는 이미 보고 있는 목록을 지울 이유가 없다. 커서만 멈춘다.
-      if (gen === generation.current) { setNextCursor(null); }
+      if (gen === generation.current) {
+        setNextCursor(null);
+      }
     } finally {
-      if (gen === generation.current) { setLoadingMore(false); }
+      if (gen === generation.current) {
+        setLoadingMore(false);
+      }
     }
-  }, [nextCursor, loadingMore, loading, selectedCategory, selectedTag, fetchPage]);
+  }, [
+    nextCursor,
+    loadingMore,
+    loading,
+    selectedCategory,
+    selectedTag,
+    fetchPage,
+  ]);
 
   useEffect(() => {
-    instance.get('/api/v2/magazine/tags')
+    instance
+      .get('/api/v2/magazine/tags')
       .then(res => setTags(unwrap<string[]>(res) ?? []))
-      .catch(() => setTags([]));   // 태그는 부가 기능이다. 실패해도 목록은 보여야 한다.
+      .catch(() => setTags([])); // 태그는 부가 기능이다. 실패해도 목록은 보여야 한다.
   }, []);
 
   // 상세에서 태그를 눌러 들어오면 그 태그로 걸러 보여준다.
@@ -121,27 +190,27 @@ const NewsScreen = () => {
     loadFirstPage(selectedCategory);
   }, [selectedCategory, selectedTag, loadFirstPage]);
 
-  const fetchNews = useCallback(() => loadFirstPage(selectedCategory), [loadFirstPage, selectedCategory]);
+  const fetchNews = useCallback(
+    () => loadFirstPage(selectedCategory),
+    [loadFirstPage, selectedCategory],
+  );
 
-  const renderNewsItem = ({ item }: { item: NewsCard }) => (
+  const renderNewsItem = ({item}: {item: NewsCard}) => (
     <TouchableOpacity
       style={styles.newsCard}
       activeOpacity={0.9}
-      onPress={() => navigation.navigate('NewsDetailScreen', { newsId: item.id })}
+      onPress={() => navigation.navigate('NewsDetailScreen', {newsId: item.id})}
       accessibilityRole="button"
-      accessibilityLabel={`${item.title} 뉴스 열기`}
-    >
+      accessibilityLabel={`${item.title} 뉴스 열기`}>
       {/* imageUrl 은 null 일 수 있다. 외부 Unsplash 폴백 대신 이미지 영역을 생략한다. */}
       {!!item.imageUrl && (
-        <Image source={{ uri: item.imageUrl }} style={styles.newsImage} />
+        <Image source={{uri: item.imageUrl}} style={styles.newsImage} />
       )}
       <View style={styles.newsContent}>
         <View style={styles.newsMeta}>
           {/* 라벨은 서버가 내려주는 categoryLabel 을 쓴다(프론트 하드코딩 매핑 제거). */}
           <Text style={styles.newsCategoryText}>{item.categoryLabel}</Text>
-          <Text style={styles.newsDate}>
-            {formatDate(item.publishedAt)}
-          </Text>
+          <Text style={styles.newsDate}>{formatDate(item.publishedAt)}</Text>
         </View>
         {/* source 는 전 건이 'onz 에디터' 라 카드에서 변별력이 0 이었다 → 요약으로 교체.
             요약이 비면(가이드 유래 글) 제목을 3줄까지 풀어 카드 높이를 벌충한다. */}
@@ -167,44 +236,81 @@ const NewsScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
+      <View style={[styles.header, {paddingTop: insets.top + 10}]}>
         <Text style={styles.headerTitle}>매거진</Text>
       </View>
 
       <View style={styles.tabBar}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabBarContent}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.tabBarContent}>
           {CATEGORIES.map(cat => (
             <TouchableOpacity
               key={cat.id}
-              style={[styles.tabItem, selectedCategory === cat.id && styles.tabItemActive]}
-              onPress={() => setSelectedCategory(cat.id)}
-            >
-              <Text style={[styles.tabLabel, selectedCategory === cat.id && styles.tabLabelActive]}>{cat.label}</Text>
+              style={[
+                styles.tabItem,
+                selectedCategory === cat.id && styles.tabItemActive,
+              ]}
+              onPress={() => setSelectedCategory(cat.id)}>
+              <Text
+                style={[
+                  styles.tabLabel,
+                  selectedCategory === cat.id && styles.tabLabelActive,
+                ]}>
+                {cat.label}
+              </Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
       </View>
 
       {tags.length > 0 && (
-        <View style={styles.tagBar}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tagBarContent}>
-            {tags.map(t => {
-              const on = selectedTag === t;
-              return (
-                <TouchableOpacity
-                  key={t}
-                  style={[styles.tagChip, on && styles.tagChipActive]}
-                  onPress={() => setSelectedTag(on ? null : t)}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected: on }}
-                  accessibilityLabel={`${t} 태그 ${on ? '해제' : '적용'}`}
-                >
-                  <Text style={[styles.tagChipText, on && styles.tagChipTextActive]}>#{t}</Text>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-        </View>
+        <Animated.View
+          style={[
+            styles.tagBar,
+            tagBarHeight > 0 && {
+              height: diffClampedScrollY.interpolate({
+                inputRange: [0, tagBarHeight],
+                outputRange: [tagBarHeight, 0],
+                extrapolate: 'clamp',
+              }),
+              overflow: 'hidden',
+            },
+          ]}>
+          <View
+            onLayout={e => {
+              if (tagBarHeight === 0) {
+                setTagBarHeight(e.nativeEvent.layout.height);
+              }
+            }}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.tagBarContent}>
+              {tags.map(t => {
+                const on = selectedTag === t;
+                return (
+                  <TouchableOpacity
+                    key={t}
+                    style={[styles.tagChip, on && styles.tagChipActive]}
+                    onPress={() => setSelectedTag(on ? null : t)}
+                    accessibilityRole="button"
+                    accessibilityState={{selected: on}}
+                    accessibilityLabel={`${t} 태그 ${on ? '해제' : '적용'}`}>
+                    <Text
+                      style={[
+                        styles.tagChipText,
+                        on && styles.tagChipTextActive,
+                      ]}>
+                      #{t}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </View>
+        </Animated.View>
       )}
 
       {loading ? (
@@ -216,17 +322,32 @@ const NewsScreen = () => {
           data={news}
           keyExtractor={item => item.id.toString()}
           renderItem={renderNewsItem}
-          contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 120 }]}
+          contentContainerStyle={[
+            styles.scrollContent,
+            {paddingBottom: insets.bottom + 120},
+          ]}
           showsVerticalScrollIndicator={false}
+          onScroll={onScroll}
+          scrollEventThrottle={16}
           onEndReached={loadMore}
           onEndReachedThreshold={0.5}
           ListFooterComponent={
-            loadingMore ? <ActivityIndicator style={styles.footerSpinner} /> : null
+            loadingMore ? (
+              <ActivityIndicator style={styles.footerSpinner} />
+            ) : null
           }
           ListEmptyComponent={
             <EmptyState
-              title={selectedTag ? `#${selectedTag} 글이 없습니다` : '해당 카테고리의 글이 없습니다'}
-              description={selectedTag ? '태그를 해제하거나 다른 태그를 골라보세요.' : '다른 카테고리를 살펴보시겠어요?'}
+              title={
+                selectedTag
+                  ? `#${selectedTag} 글이 없습니다`
+                  : '해당 카테고리의 글이 없습니다'
+              }
+              description={
+                selectedTag
+                  ? '태그를 해제하거나 다른 태그를 골라보세요.'
+                  : '다른 카테고리를 살펴보시겠어요?'
+              }
               emoji="📰"
             />
           }
@@ -279,6 +400,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   tagBar: {
+    marginTop: 8,
     borderBottomWidth: 1,
     borderBottomColor: colors.divider,
   },

@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, Platform, StyleSheet } from 'react-native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { BlurView } from '@react-native-community/blur';
+import {View, Platform, StyleSheet} from 'react-native';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {BlurView} from '@react-native-community/blur';
 import Home from '../BottomTab/Home/HomeFeedScreen';
 import NewsScreen from '../BottomTab/News/NewsScreen';
 import RecipeBookScreen from '../Screens/RecipeBook/RecipeBookScreen';
@@ -10,11 +10,11 @@ import HomeIcon from '../assets/drawable/Home.svg';
 import GuideIcon from '../assets/drawable/Guide.svg';
 import BookIcon from '../assets/drawable/Book.svg';
 import CocktailIcon from '../assets/drawable/Cocktail.svg';
-import { BottomTabParamList } from './Navigation';
-import { colors, fonts } from '../lib/theme';
+import {BottomTabParamList} from './Navigation';
+import {colors, fonts} from '../lib/theme';
 
-import { TAB_BAR_HEIGHT, TAB_BAR_GAP } from '../lib/layout';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {TAB_BAR_HEIGHT, getFloatingTabBarStyle} from '../lib/layout';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const Tab = createBottomTabNavigator<BottomTabParamList>();
 
@@ -47,13 +47,15 @@ const TabBarBackground = () => {
       />
     );
   }
-  return <View style={[StyleSheet.absoluteFill, styles.androidTabBarBackground]} />;
+  return (
+    <View style={[StyleSheet.absoluteFill, styles.androidTabBarBackground]} />
+  );
 };
 
 const styles = StyleSheet.create({
-  root: { flex: 1 },
+  root: {flex: 1},
   // 안드로이드용 blur 근사값. 완전 불투명은 아니어서 밑 콘텐츠의 색조가 살짝 비친다.
-  androidTabBarBackground: { backgroundColor: 'rgba(255, 255, 255, 0.94)' },
+  androidTabBarBackground: {backgroundColor: 'rgba(255, 255, 255, 0.94)'},
 });
 
 const BottomTabNavigator = () => {
@@ -63,7 +65,7 @@ const BottomTabNavigator = () => {
     <View style={styles.root}>
       <Tab.Navigator
         initialRouteName="홈"
-        screenOptions={({ route }) => ({
+        screenOptions={({route}) => ({
           // 아이콘만으로는 홈/바 구분이 안 됐다 → 레이블 유지.
           tabBarShowLabel: true,
           // 탭 전환이 굼뜨게 느껴진다는 QA 피드백.
@@ -77,26 +79,8 @@ const BottomTabNavigator = () => {
             fontSize: 11,
             fontFamily: fonts.medium,
           },
-          tabBarStyle: {
-            position: 'absolute',
-            marginHorizontal: 10,
-            bottom: insets.bottom + TAB_BAR_GAP,
-            // 배경은 tabBarBackground(blur) 가 그린다. 여기서 칠하면 blur 를 덮어버린다.
-            backgroundColor: 'transparent',
-            borderTopWidth: 0,
-            borderWidth: 1,
-            borderColor: colors.border,
-            shadowColor: '#000000',
-            shadowOffset: { width: 0, height: 10 },
-            shadowOpacity: 0.12,
-            shadowRadius: 15,
-            elevation: 8,
-            height: TAB_BAR_HEIGHT,
-            borderRadius: 999,
-            overflow: 'hidden',
-            paddingBottom: 0,
-            paddingTop: 0,
-          },
+          // 배경은 tabBarBackground(blur) 가 그린다. 여기서 칠하면 blur 를 덮어버린다.
+          tabBarStyle: getFloatingTabBarStyle(insets.bottom),
           tabBarItemStyle: {
             height: TAB_BAR_HEIGHT,
             paddingVertical: 8,
@@ -104,17 +88,29 @@ const BottomTabNavigator = () => {
             justifyContent: 'center',
             alignItems: 'center',
           },
-          tabBarIcon: ({ color }) => {
+          tabBarIcon: ({color}) => {
             const IconComponent =
-              ICON_PATH[route.name as keyof typeof ICON_PATH] ?? ICON_PATH['홈'];
+              ICON_PATH[route.name as keyof typeof ICON_PATH] ??
+              ICON_PATH['홈'];
             return <IconComponent width={26} height={26} color={color} />;
           },
-        })}
-      >
-        <Tab.Screen name="홈" component={Home} options={{ headerShown: false }} />
-        <Tab.Screen name="매거진" component={NewsScreen} options={{ headerShown: false }} />
-        <Tab.Screen name="레시피북" component={RecipeBookScreen} options={{ headerShown: false }} />
-        <Tab.Screen name="바" component={BarListScreen} options={{ headerShown: false }} />
+        })}>
+        <Tab.Screen name="홈" component={Home} options={{headerShown: false}} />
+        <Tab.Screen
+          name="매거진"
+          component={NewsScreen}
+          options={{headerShown: false}}
+        />
+        <Tab.Screen
+          name="레시피북"
+          component={RecipeBookScreen}
+          options={{headerShown: false}}
+        />
+        <Tab.Screen
+          name="바"
+          component={BarListScreen}
+          options={{headerShown: false}}
+        />
       </Tab.Navigator>
     </View>
   );
