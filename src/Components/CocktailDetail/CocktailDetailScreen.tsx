@@ -1,7 +1,9 @@
 // CocktailDetailScreen.tsx
 import React, { useEffect, useRef, useState } from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Animated, Dimensions, Image, Text, View, StyleSheet, Pressable, TouchableOpacity, Share, FlatList } from 'react-native';
+import { Animated, Dimensions, Image, Text, View, StyleSheet, Pressable, TouchableOpacity, FlatList } from 'react-native';
+import RNShare from 'react-native-share';
+import ImageResizer from 'react-native-image-resizer';
 import { ActivityIndicator } from 'react-native-paper';
 
 import PillStyleStatus from '../PillStyleStatus';
@@ -85,16 +87,61 @@ const ABV_LABEL: Record<string, string> = {
   STRONG: '강함',
 };
 
+/**
+ * 상단 바 아이콘 하나. 흰색(사진 위) 버전과 짙은 색(본문 위) 버전을 겹쳐 두고
+ * 스크롤 진행도에 따라 크로스페이드한다. 사진 위 버전은 반투명 원형 스크림을 깔아
+ * 사진 색과 무관하게 대비를 확보한다.
+ */
+const BarIcon = ({
+  name,
+  size = 22,
+  photoOpacity,
+  solidOpacity,
+}: {
+  name: string;
+  size?: number;
+  photoOpacity: Animated.AnimatedInterpolation<number>;
+  solidOpacity: Animated.AnimatedInterpolation<number>;
+}) => (
+  <View style={styles.barIcon}>
+    <Animated.View pointerEvents="none" style={[styles.barIconScrim, { opacity: photoOpacity }]} />
+    <Animated.View style={[styles.barIconLayer, { opacity: photoOpacity }]}>
+      <Icon name={name} size={size} color="#FFFFFF" />
+    </Animated.View>
+    <Animated.View style={[styles.barIconLayer, { opacity: solidOpacity }]}>
+      <Icon name={name} size={size} color={colors.text} />
+    </Animated.View>
+  </View>
+);
+
 export function CocktailDetailScreen({ route }: Props) {
 
   const insets = useSafeAreaInsets();
-  // 히어로는 상태바까지 차오르는 게 07안의 핵심이라 헤더가 SafeArea 밖에 있다.
-  // 그래서 스크롤하면 본문이 시계·다이나믹 아일랜드와 겹쳐 읽힌다.
-  // 히어로가 지나가는 지점에서 상단에 배경을 깔아 그 겹침만 끊는다.
+  // 상단 바(뒤로/북마크/공유)는 스크롤과 무관하게 항상 떠 있다 — ScrollView 밖에 둔다.
+  // 히어로 위에서는 사진이 어떤 색이든 아이콘이 보이도록 아이콘마다 반투명 원형 스크림을
+  // 깔고 흰색으로 그린다. 히어로를 지나 본문(흰 배경)에 닿으면 바 배경이 흰색으로 차오르고
+  // 아이콘은 짙은 색으로, 가운데 제목이 함께 떠오른다.
+  // 레퍼런스: Airbnb 숙소 상세 / App Store 앱 페이지 / Google Maps 장소 상세의 공통 패턴.
   const scrollY = useRef(new Animated.Value(0)).current;
   const heroHeight = (Dimensions.get('window').width * 4) / 3;
-  const statusScrimOpacity = scrollY.interpolate({
-    inputRange: [heroHeight - insets.top - 40, heroHeight - insets.top],
+  const BAR_H = insets.top + widthPercentage(48);
+  const fadeStart = heroHeight - BAR_H - heightPercentage(56);
+  const fadeEnd = heroHeight - BAR_H;
+  // 흰 바 배경 + 짙은 아이콘 + 하단 헤어라인이 함께 나타난다.
+  const solidOpacity = scrollY.interpolate({
+    inputRange: [fadeStart, fadeEnd],
+    outputRange: [0, 1],
+    extrapolate: 'clamp',
+  });
+  // 사진 위 흰 아이콘 + 원형 스크림은 반대로 사라진다.
+  const photoOpacity = scrollY.interpolate({
+    inputRange: [fadeStart, fadeEnd],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
+  // 제목은 바가 거의 다 찼을 때 마지막에 떠오른다.
+  const titleOpacity = scrollY.interpolate({
+    inputRange: [fadeEnd - heightPercentage(24), fadeEnd],
     outputRange: [0, 1],
     extrapolate: 'clamp',
   });
@@ -105,6 +152,16 @@ export function CocktailDetailScreen({ route }: Props) {
   const vm = useCocktailDetailViewModel(cocktailId);
   const stay10sTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // 딥링크(공유 링크·유니버설 링크)로 상세에 바로 들어오면 뒤로 갈 스택이 없다.
+  // 그대로 goBack 하면 'GO_BACK was not handled' 로 아무 반응이 없다 — 홈으로 보낸다.
+  const onBack = () => {
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.reset({ index: 0, routes: [{ name: 'BottomTabNavigator' }] });
+    }
+  };
+
   // 히어로 변형 이미지가 404 나면 원본으로 되돌린다(변형 URL 이 아직 없는 환경 대비).
   // 잔 이미지는 제거했다 — 13장을 105종이 돌려 쓰고 있어 상세마다 같은 그림이 반복됐다.
   const [heroErrored, setHeroErrored] = useState(false);
@@ -112,11 +169,30 @@ export function CocktailDetailScreen({ route }: Props) {
   const handleShare = async () => {
     if (!vm.detail) { return; }
     const url = `https://onz-cocktail.kr/cocktail/${vm.detail.id}`;
-    await Share.share({
-      title: vm.detail.korName,
-      message: `${vm.detail.korName} 칵테일을 확인해보세요!\n\n${url}`,
-      url,
-    });
+    const message = `${vm.detail.korName} 칵테일을 확인해보세요!\n\n${url}`;
+    const imgUri = heroErrored
+      ? vm.detail.imageUrl
+      : (vm.detail.imageUrlDetail ?? vm.detail.imageUrl);
+
+    // 칵테일 이미지를 로컬 파일로 받아 함께 공유한다.
+    // (RN Android 는 원격 URL·base64 첨부가 불안정해 로컬 파일 경로로 넘긴다.)
+    // 이미지 준비가 실패하면 링크만으로 폴백한다.
+    try {
+      const local = await ImageResizer.createResizedImage(imgUri, 1200, 1600, 'JPEG', 90);
+      await RNShare.open({
+        title: vm.detail.korName,
+        message,
+        url: local.uri,
+        type: 'image/jpeg',
+        failOnCancel: false,
+      });
+    } catch (e) {
+      try {
+        await RNShare.open({ title: vm.detail.korName, message, failOnCancel: false });
+      } catch {
+        // 사용자가 공유 시트를 닫은 경우 등 — 무시.
+      }
+    }
   };
 
   useEffect(() => {
@@ -189,10 +265,6 @@ export function CocktailDetailScreen({ route }: Props) {
   // 정상 렌더링
   return (
     <View style={styles.container}>
-    <Animated.View
-      pointerEvents="none"
-      style={[styles.statusScrim, { height: insets.top, opacity: statusScrimOpacity }]}
-    />
     <Animated.ScrollView
       style={styles.container}
       scrollEventThrottle={16}
@@ -211,44 +283,6 @@ export function CocktailDetailScreen({ route }: Props) {
           onError={() => setHeroErrored(true)}
         />
 
-        {/* 상단 바 전체를 한 View에 묶기 */}
-        <View style={[styles.imageHeader, { paddingTop: insets.top }]}>
-          {/* 왼쪽: 뒤로가기 */}
-          <TouchableOpacity onPress={() => navigation.goBack()}
-          >
-            <Icon name="chevron-back-sharp" size={24} color="#FFFFFF" style={{ marginRight: widthPercentage(30) }} />
-          </TouchableOpacity>
-
-
-          {/* 오른쪽: 북마크 + 공유 */}
-          <View style={styles.imageHeaderRight}>
-            <TouchableOpacity
-
-              onPress={() => {
-                if (vm.detail?.id) {
-                  vm.bookmarked(Number(vm.detail.id));
-                }
-              }}
-            >
-              <Image
-                source={
-                  vm.detail?.isBookmarked
-                    ? require('../../assets/drawable/full_save.png')
-                    : require('../../assets/drawable/save.png')
-                }
-                style={[{ marginRight: 20 }, vm.detail?.isBookmarked ?
-                  { width: 20, height: 20, tintColor: '#FFFFFF' }
-                  : { width: 20, height: 20 }]}
-                resizeMode="contain"
-              />
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={handleShare} style={{ marginRight: 10 }}>
-              <Icon name="share-social-outline" size={24} color={'#FFFFFF'} />
-            </TouchableOpacity>
-
-          </View>
-        </View>
         {/* 07안 — 사진 크기를 유지한 채 하단 그라데이션 위에 이름과 핵심 스펙을 얹는다.
             스크롤하기 전에 "무엇을 마시는지 / 얼마나 센지 / 어떤 잔에 만드는지"가 다 보인다.
 
@@ -435,6 +469,64 @@ export function CocktailDetailScreen({ route }: Props) {
 
       <View style={{ height: heightPercentage(100) }} />
     </Animated.ScrollView>
+
+    {/* 고정 상단 바 — ScrollView 밖. 히어로 위에선 투명, 본문에 닿으면 흰 배경이 차오른다. */}
+    <View
+      pointerEvents="box-none"
+      style={[styles.topBar, { height: BAR_H, paddingTop: insets.top }]}
+    >
+      <Animated.View
+        pointerEvents="none"
+        style={[styles.topBarBg, { opacity: solidOpacity }]}
+      />
+      <Animated.View
+        pointerEvents="none"
+        style={[styles.topBarHairline, { opacity: solidOpacity }]}
+      />
+
+      <TouchableOpacity
+        onPress={onBack}
+        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        accessibilityRole="button"
+        accessibilityLabel="뒤로가기"
+      >
+        <BarIcon name="chevron-back" size={24} photoOpacity={photoOpacity} solidOpacity={solidOpacity} />
+      </TouchableOpacity>
+
+      <Animated.Text
+        numberOfLines={1}
+        style={[styles.topBarTitle, { opacity: titleOpacity }]}
+      >
+        {vm.detail.korName}
+      </Animated.Text>
+
+      <View style={styles.topBarRight}>
+        <TouchableOpacity
+          onPress={() => {
+            if (vm.detail?.id) { vm.bookmarked(Number(vm.detail.id)); }
+          }}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          accessibilityRole="button"
+          accessibilityLabel={vm.detail?.isBookmarked ? '북마크 해제' : '북마크'}
+        >
+          <BarIcon
+            name={vm.detail?.isBookmarked ? 'bookmark' : 'bookmark-outline'}
+            size={22}
+            photoOpacity={photoOpacity}
+            solidOpacity={solidOpacity}
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={handleShare}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          accessibilityRole="button"
+          accessibilityLabel="공유하기"
+        >
+          <BarIcon name="share-social-outline" size={22} photoOpacity={photoOpacity} solidOpacity={solidOpacity} />
+        </TouchableOpacity>
+      </View>
+    </View>
     </View>
   );
 }
@@ -655,26 +747,57 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.7)',
     marginTop: 2,
   },
-  statusScrim: {
+  // ── 고정 상단 바 ─────────────────────────────────────────────────────
+  topBar: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#FFFFFF',
     zIndex: 10,
-  },
-  imageHeader: {
-    position: 'absolute',
-    left: 16,
-    right: 16,
-    top: 16,
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    paddingHorizontal: widthPercentage(12),
   },
-  imageHeaderRight: {
+  topBarBg: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: colors.bg,
+  },
+  topBarHairline: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: colors.border,
+  },
+  topBarTitle: {
+    flex: 1,
+    textAlign: 'center',
+    marginHorizontal: widthPercentage(8),
+    fontFamily: fonts.semibold,
+    fontSize: fontPercentage(16),
+    color: colors.text,
+  },
+  topBarRight: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  barIcon: {
+    width: widthPercentage(40),
+    height: widthPercentage(40),
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  barIconScrim: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: widthPercentage(20),
+    backgroundColor: 'rgba(0,0,0,0.28)',
+  },
+  barIconLayer: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   statusWrapper: {
     flexDirection: 'row',
