@@ -368,28 +368,29 @@ export function CocktailDetailScreen({ route }: Props) {
               </View>
             </View>
           ))}
+
+          {/* 단계별 화면(도구·타이머)으로 가는 입구.
+              예전엔 섹션 바깥에 검은 카드로 혼자 놓여 앞뒤 어디에도 붙지 않아 보였고
+              (QA: "그것만 너무 붕 떠 있다"), 단계가 하나도 없을 때조차 떠 있어
+              눌러도 빈 화면으로 들어갔다. → 이 섹션의 마지막 줄로 붙이고,
+              단계가 있을 때만 함께 나타난다. */}
+          <TouchableOpacity
+            style={styles.stepsCta}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={`${vm.detail.korName} 단계별로 따라 하기`}
+            onPress={() =>
+              navigation.navigate('CocktailStepsScreen', {
+                cocktailId: vm.detail!.id,
+                cocktailName: vm.detail!.korName,
+              })
+            }
+          >
+            <Text style={styles.stepsCtaTitle}>단계별로 따라 하기</Text>
+            <Text style={styles.stepsCtaArrow}>›</Text>
+          </TouchableOpacity>
         </Section>
       )}
-
-      {/* 만드는 법 — 단계별 화면(도구·타이머 포함)으로 가는 입구 */}
-      <TouchableOpacity
-        style={styles.stepsCta}
-        activeOpacity={0.9}
-        accessibilityRole="button"
-        accessibilityLabel={`${vm.detail.korName} 만드는 법 보기`}
-        onPress={() =>
-          navigation.navigate('CocktailStepsScreen', {
-            cocktailId: vm.detail!.id,
-            cocktailName: vm.detail!.korName,
-          })
-        }
-      >
-        <View style={styles.stepsCtaTextWrap}>
-          <Text style={styles.stepsCtaTitle}>만드는 법</Text>
-          <Text style={styles.stepsCtaSub}>단계별로 따라 해보세요</Text>
-        </View>
-        <Text style={styles.stepsCtaArrow}>›</Text>
-      </TouchableOpacity>
 
       <Section tone="card" eyebrow="당신의 한 줄" title="이 칵테일, 입문자도 즐길 수 있을까요?">
         <View style={styles.buttonContainer}>
@@ -658,29 +659,27 @@ const styles = StyleSheet.create({
     fontSize: fontPercentage(15),
     lineHeight: fontPercentage(24),
   },
+  // 마지막 단계 밑에 바로 붙는 줄. 앞의 단계 목록과 같은 기준선을 쓰고
+  // 윗 실선으로만 구분한다 — 별도의 표면(검은 카드)을 만들지 않는다.
   stepsCta: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginHorizontal: widthPercentage(20),
+    marginTop: heightPercentage(4),
     paddingVertical: heightPercentage(14),
-    paddingHorizontal: widthPercentage(16),
-    borderRadius: widthPercentage(12),
-    backgroundColor: '#1B1B1B',
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
   },
-  stepsCtaTextWrap: { flex: 1 },
   stepsCtaTitle: {
-    fontFamily: 'Pretendard-Medium',
-    fontSize: fontPercentage(16),
-    color: '#FFFFFF',
+    fontFamily: fonts.medium,
+    fontSize: fontPercentage(15),
+    color: colors.text,
   },
-  stepsCtaSub: {
-    marginTop: heightPercentage(2),
-    fontFamily: 'Pretendard-Regular',
-    fontSize: fontPercentage(13),
-    color: '#BDBDBD',
+  stepsCtaArrow: {
+    fontFamily: fonts.regular,
+    fontSize: fontPercentage(20),
+    color: colors.textTertiary,
   },
-  stepsCtaArrow: { fontFamily: fonts.regular, fontSize: fontPercentage(22), color: '#FFFFFF' },
   storyCard: {
     marginTop: heightPercentage(12),
     // Section 이 좌우 20 을 이미 준다. 여기서 또 주면 이 카드만 안쪽으로 밀린다.

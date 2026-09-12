@@ -1,7 +1,7 @@
 import { Image, Platform, StyleSheet, Text, View, FlatList } from 'react-native';
-import React, { useRef } from 'react';
-import { Pressable, ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
-import { ActivityIndicator, Button } from 'react-native-paper';
+import React, { useCallback, useRef } from 'react';
+import { Pressable, TouchableOpacity } from 'react-native-gesture-handler';
+import { ActivityIndicator } from 'react-native-paper';
 import { fontPercentage, heightPercentage, widthPercentage } from '../../assets/styles/FigmaScreen';
 import { colors } from '../../lib/theme';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -13,6 +13,8 @@ import MIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import EIcon from 'react-native-vector-icons/EvilIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FilterBottomSheet, { FilterBottomSheetRef } from '../../Components/BottomSheet/FilterBottomSheet/FilterBottomSheet';
+import { DEFAULT_FILTER } from '../../Components/BottomSheet/FilterBottomSheet/FilterBottomSheetViewModel';
+import FilterTriggerRow from '../../Components/Filter/FilterTriggerRow';
 import Icon from 'react-native-vector-icons/Ionicons';
 type Props = NativeStackScreenProps<RootStackParamList, 'SearchResultScreen'>;
 
@@ -23,6 +25,13 @@ const SearchResultScreen = ({ navigation, route }: Props) => {
   const filterRef = useRef<FilterBottomSheetRef>(null);
   const vm = useSearchResultViewModel(keyword);
 
+  const { refetch } = vm;
+
+  // 목록과 시트를 같이 되돌린다 — 시트 상태만 남으면 다시 열었을 때 해제한 조건이 선택돼 보인다.
+  const handleResetFilter = useCallback(() => {
+    filterRef.current?.reset();
+    refetch(DEFAULT_FILTER);
+  }, [refetch]);
 
   return (
     <SafeAreaView edges={['top']} style={styles.container}>
@@ -62,46 +71,13 @@ const SearchResultScreen = ({ navigation, route }: Props) => {
               </TouchableOpacity>
             </View>
 
-            {/* 필터 뷰 */}
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.filterView}
-            >
-              {['최신순', '도수', '스타일', '맛', '베이스'].map((label, idx) => {
-                const filter = vm.appliedFilter;
-
-                const isSelected =
-                  (label === '최신순' && filter.sort !== '최신순') ||
-                  (label === '도수' && filter.degree) ||
-                  (label === '스타일' && filter.style) ||
-                  (label === '맛' && filter.taste.length > 0) ||
-                  (label === '베이스' && filter.base.length > 0);
-
-                return (
-                  <Button
-                    key={idx}
-                    mode={isSelected ? 'contained' : 'outlined'}
-                    icon={label === '최신순' ? undefined : 'chevron-down'}
-                    compact
-                    contentStyle={[styles.filterButtonContent, { height: 'auto', paddingVertical: 4 }]}
-
-                    style={[
-                      styles.chip,
-                      isSelected ? styles.chipSelected : styles.chipUnselected,
-                    ]}
-
-                    labelStyle={[
-                      styles.chipLabel,
-                      isSelected && styles.chipLabelSelected,
-                    ]}
-                    onPress={() => bottomSheetRef.current?.open()}
-                  >
-                    {label}
-                  </Button>
-                );
-              })}
-            </ScrollView>
+            {/* 필터 진입점 — 조건별 칩이 전부 같은 시트를 열던 것을 하나로 합쳤다. */}
+            <FilterTriggerRow
+              filter={vm.appliedFilter}
+              onPress={() => bottomSheetRef.current?.open()}
+              onReset={handleResetFilter}
+              style={styles.filterRow}
+            />
           </View>
         }
 
@@ -208,51 +184,10 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
 
-  filterView: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  filterRow: {
     paddingHorizontal: widthPercentage(8),
-    paddingVertical: 4,
-    gap: 8,
-    paddingBottom: heightPercentage(24),
-  },
-  filterButtonContent: {
-    // 3. 버튼 내부 레이아웃 설정
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  chip: {
-    borderRadius: 100,
-    borderWidth: 1,
-    // 2. 고정 높이보다는 최소 높이를 지정하거나 패딩으로 조절하세요.
-    minHeight: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 0, // 버튼 그림자 제거 (필요시)
-  },
-  chipUnselected: {
-    backgroundColor: colors.bg,
-    borderColor: '#E0E0E0',
-  },
-  chipSelected: {
-    backgroundColor: '#313131',
-    borderColor: '#E0E0E0',
-  },
-  chipLabel: {
-    fontFamily: 'Pretendard-Medium',
-    fontSize: fontPercentage(14),
-    color: '#616161',
-    includeFontPadding: false,
-    lineHeight: fontPercentage(18),
-    textAlignVertical: 'center',
-    marginVertical: heightPercentage(4),
-    marginHorizontal: widthPercentage(10),
-  },
-  chipLabelSelected: {
-    fontFamily: 'Pretendard-Medium',
-    fontSize: fontPercentage(14),
-    color: '#FFFFFF',
+    paddingTop: 4,
+    paddingBottom: heightPercentage(16),
   },
   listContent: {
     paddingBottom: 24,

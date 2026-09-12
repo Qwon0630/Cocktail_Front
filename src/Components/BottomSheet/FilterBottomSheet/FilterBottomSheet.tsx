@@ -65,6 +65,12 @@ export const FilterBottomSheet = forwardRef<FilterBottomSheetRef, Props>(
 
     }));
 
+    // 단일 선택(도수·스타일)도 같은 값을 다시 누르면 해제된다.
+    // 이전엔 setter(option) 만 해서 한 번 고르면 '초기화' 말고는 풀 방법이 없었다.
+    const toggleSingle = (current: string, value: string, setter: (v: string) => void) => {
+      setter(current === value ? '' : value);
+    };
+
     const toggleValue = (list: string[], value: string, setter: (v: string[]) => void) => {
       if (list.includes(value)) {
         setter(list.filter(item => item !== value));
@@ -137,7 +143,7 @@ export const FilterBottomSheet = forwardRef<FilterBottomSheetRef, Props>(
                 key={option}
                 label={option}
                 selected={vm.selectedDegree === option}
-                onPress={() => vm.setSelectedDegree(option)}
+                onPress={() => toggleSingle(vm.selectedDegree, option, vm.setSelectedDegree)}
               />
             ))}
           </View>
@@ -152,7 +158,7 @@ export const FilterBottomSheet = forwardRef<FilterBottomSheetRef, Props>(
                 key={option}
                 label={option}
                 selected={vm.selectedStyle === option}
-                onPress={() => vm.setSelectedStyle(option)}
+                onPress={() => toggleSingle(vm.selectedStyle, option, vm.setSelectedStyle)}
               />
             ))}
           </View>

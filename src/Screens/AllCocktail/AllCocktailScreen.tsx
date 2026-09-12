@@ -5,13 +5,12 @@ import {
   StyleSheet,
   View,
   Pressable,
-  ScrollView,
   TouchableOpacity,
   Platform,
   Image,
   FlatList,
 } from 'react-native';
-import {ActivityIndicator, Button, Text} from 'react-native-paper';
+import {ActivityIndicator, Text} from 'react-native-paper';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTabBarSpace, getFloatingTabBarStyle} from '../../lib/layout';
 import {
@@ -28,6 +27,8 @@ import {CocktailCard as CocktailCardModel} from '../../model/domain/CocktailCard
 import FilterBottomSheet, {
   FilterBottomSheetRef,
 } from '../../Components/BottomSheet/FilterBottomSheet/FilterBottomSheet';
+import {DEFAULT_FILTER} from '../../Components/BottomSheet/FilterBottomSheet/FilterBottomSheetViewModel';
+import FilterTriggerRow from '../../Components/Filter/FilterTriggerRow';
 import useAllCocktailViewModel from './AllCocktailViewModel';
 import ErrorState from '../../Components/common/ErrorState';
 import EmptyState from '../../Components/common/EmptyState';
@@ -43,7 +44,7 @@ type StackProps = NativeStackScreenProps<
 
 /**
  * embedded=true 이면 RecipeBookScreen 이 헤더(제목+검색)를 대신 그리므로
- * 자체 헤더와 상단 세이프에어리어 여백을 생략한다. 필터 칩은 그대로 유지.
+ * 자체 헤더와 상단 세이프에어리어 여백을 생략한다. 필터 진입점은 그대로 유지.
  */
 type Props = Omit<Partial<StackProps>, 'navigation'> & {
   navigation: StackProps['navigation'] | any;
@@ -78,6 +79,15 @@ const AllCocktailScreen = ({navigation, embedded = false}: Props) => {
     () => ({loading: vm.loading, filter: vm.appliedFilter}),
     [vm.loading, vm.appliedFilter],
   );
+
+  const {refetch} = vm;
+
+  // 헤더의 '초기화' 는 목록과 시트 양쪽을 되돌려야 한다.
+  // 시트 상태만 남겨두면 다시 열었을 때 해제된 조건이 선택된 채로 보인다.
+  const handleResetFilter = useCallback(() => {
+    filterRef.current?.reset();
+    refetch(DEFAULT_FILTER);
+  }, [refetch]);
 
   const handleEndReached = useCallback(() => {
     if (!vm.isLast && !vm.loading) {
@@ -167,40 +177,11 @@ const AllCocktailScreen = ({navigation, embedded = false}: Props) => {
             </TouchableOpacity>
           </View>
         )}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filterView}>
-          {['최신순', '도수', '스타일', '맛', '베이스'].map((label, idx) => {
-            const filter = vm.appliedFilter;
-            const isSelected =
-              (label === '최신순' && filter.sort !== '최신순') ||
-              (label === '도수' && filter.degree) ||
-              (label === '스타일' && filter.style) ||
-              (label === '맛' && filter.taste.length > 0) ||
-              (label === '베이스' && filter.base.length > 0);
-
-            return (
-              <Button
-                key={idx}
-                mode={isSelected ? 'contained' : 'outlined'}
-                icon={label === '최신순' ? undefined : 'chevron-down'}
-                compact
-                contentStyle={styles.filterButtonContent}
-                style={[
-                  styles.chip,
-                  isSelected ? styles.chipSelected : styles.chipUnselected,
-                ]}
-                labelStyle={[
-                  styles.chipLabel,
-                  isSelected && styles.chipLabelSelected,
-                ]}
-                onPress={() => bottomSheetRef.current?.open()}>
-                {label}
-              </Button>
-            );
-          })}
-        </ScrollView>
+        <FilterTriggerRow
+          filter={vm.appliedFilter}
+          onPress={() => bottomSheetRef.current?.open()}
+          onReset={handleResetFilter}
+        />
       </View>
 
       <FlatList
@@ -317,51 +298,6 @@ const styles = StyleSheet.create({
     width: 22,
     height: 22,
     tintColor: '#1a1a1a',
-  },
-  filterView: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    gap: 8,
-    paddingBottom: 24,
-  },
-  filterButtonContent: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  chip: {
-    borderRadius: 100,
-    borderWidth: 1,
-
-    minHeight: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 0,
-  },
-  chipUnselected: {
-    backgroundColor: colors.bg,
-    borderColor: '#E0E0E0',
-  },
-  chipSelected: {
-    backgroundColor: '#313131',
-    borderColor: '#E0E0E0',
-  },
-  chipLabel: {
-    fontFamily: 'Pretendard-Medium',
-    fontSize: fontPercentage(14),
-    color: '#616161',
-    includeFontPadding: false,
-    lineHeight: fontPercentage(18),
-    textAlignVertical: 'center',
-    marginVertical: heightPercentage(4),
-    marginHorizontal: widthPercentage(10),
-  },
-  chipLabelSelected: {
-    fontFamily: 'Pretendard-Medium',
-    fontSize: fontPercentage(14),
-    color: '#FFFFFF',
   },
   listContent: {},
   row: {
