@@ -93,10 +93,24 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Configure NDK (use pre-installed 28.2.13676358)
+      # 러너 프리인스톨 버전(28.2)을 여기 박아 두고 있었는데, build.gradle 은
+      # vision-camera 링크 크래시 때문에 27.1 로 되돌아갔다(21974d71). 둘이 어긋나
+      # [CXX1104] 로 APK 빌드가 깨졌다 → build.gradle 을 단일 출처로 삼고, 러너에
+      # 없는 버전이면 설치한다.
+      - name: Configure NDK (build.gradle 의 ndkVersion 을 따른다)
         run: |
-          printf 'sdk.dir=%s\nndk.dir=%s/ndk/28.2.13676358\n' \
-            "${ANDROID_HOME}" "${ANDROID_HOME}" > android/local.properties
+          NDK_VERSION=$(grep -o 'ndkVersion = "[^"]*"' android/build.gradle | head -1 | cut -d'"' -f2)
+          if [ -z "$NDK_VERSION" ]; then
+            echo "build.gradle 에서 ndkVersion 을 찾지 못했다." >&2
+            exit 1
+          fi
+          echo "ndkVersion=$NDK_VERSION"
+          if [ ! -d "${ANDROID_HOME}/ndk/${NDK_VERSION}" ]; then
+            echo "러너에 없다 → sdkmanager 로 설치."
+            "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --install "ndk;${NDK_VERSION}"
+          fi
+          printf 'sdk.dir=%s\nndk.dir=%s/ndk/%s\n' \
+            "${ANDROID_HOME}" "${ANDROID_HOME}" "${NDK_VERSION}" > android/local.properties
 
       - name: Decode keystore
         run: |
